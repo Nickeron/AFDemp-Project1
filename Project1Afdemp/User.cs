@@ -119,6 +119,7 @@ namespace Project1Afdemp
                 Console.ResetColor();
                 return true;
             }
+            Console.ResetColor();
             return false;
         }
 

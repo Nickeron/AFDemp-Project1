@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security;
 
 namespace Project1Afdemp
 {
@@ -12,16 +11,17 @@ namespace Project1Afdemp
         {
             string[] signOrLogItems = { "Sign Up", "Log In" };
             short userChoice = Menus.HorizontalMenu(StringsFormatted.Welcome, signOrLogItems);
+            User activeUser;
 
             if (userChoice == 1)
             {
-                User activeUser = new User("", new System.Security.SecureString());
+                activeUser = new User("", new SecureString());
             }
             else
             {
-                User activeUser = new User("", new System.Security.SecureString(), true);
+                activeUser = new User("", new SecureString(), true);
             }
-
+            Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUser.UserName}");
             Console.ReadKey();
         }
 
