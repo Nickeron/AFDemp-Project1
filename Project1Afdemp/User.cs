@@ -10,6 +10,7 @@ namespace Project1Afdemp
         private static Dictionary<string, SecureString> UsersList { get; set; }
         public string UserName { get; set; }
         public SecureString Password { get; set; }
+        public Accessibility UserAccess { get; private set; }
 
         static User()
         {
@@ -34,7 +35,7 @@ namespace Project1Afdemp
             {
                 UserName = userName;
             }
-            if (IsWrongPassword(password, isNewUser))
+            if (UserName!="guest" || IsWrongPassword(password, isNewUser))
             {
                 AskPassword(isNewUser);
             }
@@ -42,7 +43,7 @@ namespace Project1Afdemp
             {
                 Password = password;
             }
-            
+            SetAccessibility();
         }
 
         private void AskUserName(bool isNewUser)
@@ -80,6 +81,7 @@ namespace Project1Afdemp
                 Console.ResetColor();
                 return true;
             }
+            Console.ResetColor();
             return false;    
         }
 
@@ -126,6 +128,22 @@ namespace Project1Afdemp
         private bool IDmatched(SecureString password)
         {
             return (PasswordHandling.SecureCompare(UsersList[UserName], password));
+        }
+
+        private void SetAccessibility()
+        {
+            if(UserName == "admin")
+            {
+                UserAccess = Accessibility.administrator;
+            }
+            else if (UserName == "guest")
+            {
+                UserAccess = Accessibility.guest;
+            }
+            else
+            {
+                UserAccess = Accessibility.user;
+            }
         }
         
     }
