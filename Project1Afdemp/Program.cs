@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
+using System.Data.Entity;
 
 namespace Project1Afdemp
 {
@@ -9,7 +10,6 @@ namespace Project1Afdemp
     {
         static void Main(string[] args)
         {
-
             User activeUser = LoginScreen();
             MainMenu(activeUser);
 
@@ -30,6 +30,17 @@ namespace Project1Afdemp
             else
             {
                 activeUser = new User("", new SecureString(), true);
+                using (var database = new DatabaseStuff())
+                {
+                    try
+                    {
+                        database.Users.Add(activeUser);
+                        database.SaveChanges();
+                    }
+                    catch (Exception e) { Console.WriteLine(e); }
+
+                    
+                }
             }
             Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUser.UserName}");
             return activeUser;
@@ -51,17 +62,17 @@ namespace Project1Afdemp
 
             switch (userChoice)
             {
-                case 1:
+                case 0:
                     {
                         SendEmail(activeUser);
                         break;
                     }
-                case 2:
+                case 1:
                     {
                         ReadReceived(activeUser);
                         break;
                     }
-                case 3:
+                case 2:
                     {
                         TransactionHistory(activeUser);
                         break;
@@ -76,22 +87,42 @@ namespace Project1Afdemp
 
         public static void SendEmail(User activeUser)
         {
+            using (var database = new DatabaseStuff())
+            {
+                // Display all Blogs from the database 
+                var query = from user in database.Users
+                            orderby user.UserName
+                            select user;
 
+                Console.WriteLine("All users in the database:");
+                foreach (User user in query)
+                {
+                    Console.WriteLine(user.UserName);
+                }
+
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey();
+            }
+            string[] sendEmailItems = new string[] { "Send Email", "Read Received", "Transaction History" };
+            short userChoice = Menus.VerticalMenu(StringsFormatted.SendEmail, sendEmailItems);
         }
 
         public static void ReadReceived(User activeUser)
         {
-
+            string[] readEmailItems = new string[] { "Send Email", "Read Received", "Transaction History" };
+            short userChoice = Menus.VerticalMenu(StringsFormatted.ReadEmails, readEmailItems);
         }
 
         public static void TransactionHistory(User activeUser)
         {
-
+            string[] historyItems = new string[] { "Send Email", "Read Received", "Transaction History" };
+            short userChoice = Menus.VerticalMenu(StringsFormatted.History, historyItems);
         }
 
         public static void ManageUsers(User activeUser)
         {
-
+            string[] manageUsersItems = new string[] { "Send Email", "Read Received", "Transaction History" };
+            short userChoice = Menus.VerticalMenu(StringsFormatted.ManageUsers, manageUsersItems);
         }
 
 

@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Security;
 
 
 namespace Project1Afdemp
 {
-    class User
+    [Table("Users")]
+    public class User
     {
         private static Dictionary<string, SecureString> UsersList { get; set; }
+        [Key]
         public string UserName { get; set; }
         public SecureString Password { get; set; }
         public Accessibility UserAccess { get; private set; }

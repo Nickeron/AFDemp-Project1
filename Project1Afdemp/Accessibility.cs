@@ -1,6 +1,6 @@
 ﻿namespace Project1Afdemp
 {
-    enum Accessibility
+    public enum Accessibility
     {
         administrator,
         user,
