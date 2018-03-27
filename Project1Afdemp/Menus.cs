@@ -16,32 +16,29 @@ namespace Project1Afdemp
             do
             {
                 Console.Clear();
-                Console.WriteLine(message);
+                Console.WriteLine(message+'\n');
 
                 for (item = 0; item < menuItems.Length; item++)
                 {
                     if (currentItem == item)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write($"\t|{menuItems[item]}|".PadRight(10));
+                        Console.WriteLine($"\n\t|{menuItems[item]}|".PadRight(10));
                     }
                     else
                     {
-                        Console.Write($"\t{menuItems[item]}".PadRight(10));
+                        Console.WriteLine($"\n\t{menuItems[item]}".PadRight(10));
                     }
                     Console.ResetColor();
                 }
-                do
-                {
-                    keyInfo = Console.ReadKey(true);
-                } while (keyInfo.Key.ToString() == "RightArrow" || keyInfo.Key.ToString() == "LeftArrow" || keyInfo.KeyChar == 13);
-
-                if (keyInfo.Key.ToString() == "RightArrow")
+                keyInfo = Console.ReadKey(true);
+               
+                if (keyInfo.Key.ToString() == "UpArrow")
                 {
                     currentItem++;
                     if (currentItem > menuItems.Length - 1) currentItem = 0;
                 }
-                else if (keyInfo.Key.ToString() == "LeftArrow")
+                else if (keyInfo.Key.ToString() == "DownArrow")
                 {
                     currentItem--;
                     if (currentItem < 0) currentItem = Convert.ToInt16(menuItems.Length - 1);
@@ -59,7 +56,7 @@ namespace Project1Afdemp
             do
             {
                 Console.Clear();
-                Console.WriteLine(message);
+                Console.WriteLine(message+'\n');
 
                 for (item = 0; item < menuItems.Length; item++)
                 {

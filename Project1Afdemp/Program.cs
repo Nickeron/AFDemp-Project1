@@ -22,6 +22,9 @@ namespace Project1Afdemp
                 activeUser = new User("", new SecureString(), true);
             }
             Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUser.UserName}");
+
+            string[] mainMenuItems = { "Send Email", "Read Received" };
+            userChoice = Menus.VerticalMenu(StringsFormatted.MainMenu, mainMenuItems);
             Console.ReadKey();
         }
 
