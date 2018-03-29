@@ -7,13 +7,13 @@ namespace Project1Afdemp.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class CreateUsersAndMessages : IMigrationMetadata
+    public sealed partial class createUserAndMessage : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(CreateUsersAndMessages));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(createUserAndMessage));
         
         string IMigrationMetadata.Id
         {
-            get { return "201803291400242_CreateUsersAndMessages"; }
+            get { return "201803291732214_createUserAndMessage"; }
         }
         
         string IMigrationMetadata.Source

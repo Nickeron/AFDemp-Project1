@@ -94,7 +94,7 @@ namespace Project1Afdemp
                 try
                 {
                     database.Messages.Add(email);
-                    database.SaveChanges();
+                    //database.SaveChanges();
                     Console.WriteLine("Email sent successfully to"+receiver.UserName);
                 }
                 catch (Exception e) { Console.WriteLine(e); }

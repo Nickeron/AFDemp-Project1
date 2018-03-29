@@ -14,7 +14,8 @@ namespace Project1Afdemp
             {
                 Console.Clear();
                 Console.WriteLine(message+'\n');
-
+                if (menuItems.Count == 0)
+                    return "";
                 for (item = 0; item < menuItems.Count; item++)
                 {
                     if (currentItem == item)
@@ -54,7 +55,8 @@ namespace Project1Afdemp
             {
                 Console.Clear();
                 Console.WriteLine(message + '\n');
-
+                if (menuItems.Count == 0)
+                    return "";
                 for (item = 0; item < menuItems.Count; item++)
                 {
                     if (currentItem == item)

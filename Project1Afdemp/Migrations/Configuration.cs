@@ -9,8 +9,7 @@ namespace Project1Afdemp.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = true;
-            AutomaticMigrationDataLossAllowed = true;
+            AutomaticMigrationsEnabled = false;
         }
 
         protected override void Seed(Project1Afdemp.DatabaseStuff context)
