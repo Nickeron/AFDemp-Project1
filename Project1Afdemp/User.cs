@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security;
-using System.Linq;
-
-namespace Project1Afdemp
+﻿namespace Project1Afdemp
 {
     public class User
     {

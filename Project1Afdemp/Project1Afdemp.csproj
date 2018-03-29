@@ -57,9 +57,9 @@
     <Compile Include="DatabaseStuff.cs" />
     <Compile Include="Menus.cs" />
     <Compile Include="Message.cs" />
-    <Compile Include="Migrations\201803290846065_CreateUsersAndMessages.cs" />
-    <Compile Include="Migrations\201803290846065_CreateUsersAndMessages.Designer.cs">
-      <DependentUpon>201803290846065_CreateUsersAndMessages.cs</DependentUpon>
+    <Compile Include="Migrations\201803291400242_CreateUsersAndMessages.cs" />
+    <Compile Include="Migrations\201803291400242_CreateUsersAndMessages.Designer.cs">
+      <DependentUpon>201803291400242_CreateUsersAndMessages.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="PasswordHandling.cs" />
@@ -75,8 +75,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201803290846065_CreateUsersAndMessages.resx">
-      <DependentUpon>201803290846065_CreateUsersAndMessages.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201803291400242_CreateUsersAndMessages.resx">
+      <DependentUpon>201803291400242_CreateUsersAndMessages.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

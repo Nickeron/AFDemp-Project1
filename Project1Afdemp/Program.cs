@@ -10,19 +10,16 @@ namespace Project1Afdemp
         {
             UserManager activeUser = LoginScreen();
             MainMenu(activeUser);
-
-
-            Console.ReadKey();
         }
 
         public static UserManager LoginScreen()
         {
             UserManager activeUser;
             List<string> signOrLogItems = new List<string>{ "Sign Up", "Log In" };
-            short userChoice = Menus.HorizontalMenu(StringsFormatted.Welcome, signOrLogItems);
+            string userChoice = Menus.HorizontalMenu(StringsFormatted.Welcome, signOrLogItems);
             using (var database = new DatabaseStuff())
             {
-                if (userChoice == 1)
+                if (userChoice == "Log In")
                 {
                     activeUser = new UserManager();
                 }
@@ -43,46 +40,89 @@ namespace Project1Afdemp
 
         public static void MainMenu(UserManager activeUser)
         {
-            List<string> mainMenuItems;
+            List<string> mainMenuItems = new List<string> { "Send Email", "Read Received", "Transaction History", "Exit" };
             if (activeUser.UserAccess == Accessibility.administrator)
             {
-                mainMenuItems = new List<string> { "Send Email", "Read Received", "Transaction History" , "Manage Users"};
+                mainMenuItems.Insert(3, "Manage Users");
             }
-            else
+            while (true)
             {
-                mainMenuItems = new List<string> { "Send Email", "Read Received", "Transaction History" };
-            }
-            
-            short userChoice = Menus.VerticalMenu(StringsFormatted.MainMenu, mainMenuItems);
+                string userChoice = Menus.VerticalMenu(StringsFormatted.MainMenu, mainMenuItems);
 
-            switch (userChoice)
-            {
-                case 0:
-                    {
-                        SendEmail(activeUser);
-                        break;
-                    }
-                case 1:
-                    {
-                        ReadReceived(activeUser);
-                        break;
-                    }
-                case 2:
-                    {
-                        TransactionHistory(activeUser);
-                        break;
-                    }
-                default:
-                    {
-                        ManageUsers(activeUser);
-                        break;
-                    }
-            }
+                switch (userChoice)
+                {
+                    case "Send Email":
+                        {
+                            SendEmail(activeUser);
+                            break;
+                        }
+                    case "Read Received":
+                        {
+                            ReadReceived(activeUser);
+                            break;
+                        }
+                    case "Transaction History":
+                        {
+                            TransactionHistory(activeUser);
+                            break;
+                        }
+                    case "Manage Users":
+                        {
+                            ManageUsers(activeUser);
+                            break;
+                        }
+                    case "Exit":
+                        {
+                            Environment.Exit(0);
+                            break;
+                        }
+                }
+            } 
         }
 
         public static void SendEmail(UserManager activeUser)
         {
-            List<string> sendEmailItems = new List<string>();
+            User receiver = SelectUser(activeUser);
+            Console.WriteLine(StringsFormatted.SendEmail);
+            Console.Write("\n\n\tTitle: ");
+            string MessageTitle = Console.ReadLine();
+            Console.Write("\n\tBody: ");
+            string MessageBody = Console.ReadLine();
+            using (var database = new DatabaseStuff())
+            {
+                Message email = new Message(activeUser.TheUser, receiver, MessageTitle, MessageBody);
+                try
+                {
+                    database.Messages.Add(email);
+                    database.SaveChanges();
+                    Console.WriteLine("Email sent successfully to"+receiver.UserName);
+                }
+                catch (Exception e) { Console.WriteLine(e); }
+            }
+        }
+
+        public static void ReadReceived(UserManager activeUser)
+        {
+            List<string> readEmailItems = new List<string> ();
+
+            string userChoice = Menus.VerticalMenu(StringsFormatted.ReadEmails, readEmailItems);
+        }
+
+        public static void TransactionHistory(UserManager activeUser)
+        {
+            List<string> historyItems = new List<string> { "Send Email", "Read Received", "Transaction History" };
+            string userChoice = Menus.VerticalMenu(StringsFormatted.History, historyItems);
+        }
+
+        public static void ManageUsers(UserManager activeUser)
+        {
+            List<string> manageUsersItems = new List<string> { "Send Email", "Read Received", "Transaction History" };
+            string userChoice = Menus.VerticalMenu(StringsFormatted.ManageUsers, manageUsersItems);
+        }
+
+        public static User SelectUser(UserManager activeUser)
+        {
+            List<string> selectUserItems = new List<string>();
             using (var database = new DatabaseStuff())
             {
                 var query = from user in database.Users
@@ -92,34 +132,19 @@ namespace Project1Afdemp
                 {
                     foreach (User user in query)
                     {
-                        sendEmailItems.Add(user.UserName);
+                        if (user.UserName != activeUser.UserName)
+                        {
+                            selectUserItems.Add(user.UserName);
+                        }
                     }
                 }
                 catch (Exception e) { Console.WriteLine(e); }
+
+                string sUser = Menus.VerticalMenu(StringsFormatted.SelectUser, selectUserItems);
+
+                Console.Clear();
+                return database.Users.Single(i => i.UserName == sUser);
             }
-            sendEmailItems.Add("back");
-            short userChoice = Menus.VerticalMenu(StringsFormatted.SendEmail, sendEmailItems);
         }
-
-        public static void ReadReceived(UserManager activeUser)
-        {
-            List<string> readEmailItems = new List<string> { "Send Email", "Read Received", "Transaction History" };
-            short userChoice = Menus.VerticalMenu(StringsFormatted.ReadEmails, readEmailItems);
-        }
-
-        public static void TransactionHistory(UserManager activeUser)
-        {
-            List<string> historyItems = new List<string> { "Send Email", "Read Received", "Transaction History" };
-            short userChoice = Menus.VerticalMenu(StringsFormatted.History, historyItems);
-        }
-
-        public static void ManageUsers(UserManager activeUser)
-        {
-            List<string> manageUsersItems = new List<string> { "Send Email", "Read Received", "Transaction History" };
-            short userChoice = Menus.VerticalMenu(StringsFormatted.ManageUsers, manageUsersItems);
-        }
-
-
-
     }
 }

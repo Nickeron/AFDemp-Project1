@@ -5,7 +5,7 @@ namespace Project1Afdemp
 {
     class Menus
     {
-        public static short VerticalMenu(string message, List<string> menuItems)
+        public static string VerticalMenu(string message, List<string> menuItems)
         {
             short currentItem = 0, item;
             ConsoleKeyInfo keyInfo;
@@ -42,10 +42,10 @@ namespace Project1Afdemp
                 }
                 // Loop around until the user presses enter.
             } while (keyInfo.KeyChar != 13);
-            return currentItem;
+            return menuItems[currentItem];
         }
 
-        public static short HorizontalMenu(string message, List<string> menuItems)
+        public static string HorizontalMenu(string message, List<string> menuItems)
         {
             short currentItem = 0, item;
             ConsoleKeyInfo keyInfo;
@@ -82,7 +82,7 @@ namespace Project1Afdemp
                 }
                 // Loop around until the user presses enter.
             } while (keyInfo.KeyChar != 13);
-            return currentItem;
+            return menuItems[currentItem];
         }
     }
 }

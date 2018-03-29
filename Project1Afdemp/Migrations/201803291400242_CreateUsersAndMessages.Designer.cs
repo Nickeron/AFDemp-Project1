@@ -13,7 +13,7 @@ namespace Project1Afdemp.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201803290846065_CreateUsersAndMessages"; }
+            get { return "201803291400242_CreateUsersAndMessages"; }
         }
         
         string IMigrationMetadata.Source
