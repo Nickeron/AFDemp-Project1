@@ -12,6 +12,7 @@ namespace Project1Afdemp
         public Accessibility UserAccess { get; private set; }
         private static DatabaseStuff UserDatabase { get; set; }
 
+        #region Constructors
         static UserManager()
         {
             UserDatabase = new DatabaseStuff();
@@ -33,14 +34,16 @@ namespace Project1Afdemp
             }
             else
             {
-                Password = PasswordHandling.SecureStringToString(password, UserName);
+                Password = PasswordHandling.PasswordToHash(password, UserName);
             }
             SetAccessibility();
             TheUser = new User(UserName, Password, UserAccess);
         }
 
         public UserManager(bool isNewUser = false) : this("", new SecureString(), isNewUser) { }
+        #endregion
 
+        #region UserName Methods
         private void AskUserName(bool isNewUser)
         {
             Console.Clear();
@@ -84,7 +87,9 @@ namespace Project1Afdemp
         {
             return UserDatabase.Users.Any(i => i.UserName == userName);
         }
+        #endregion
 
+        #region Password Methods
         private void AskPassword(bool isNewUser)
         {
             Console.Clear();
@@ -95,7 +100,7 @@ namespace Project1Afdemp
                 Console.Write("\n\n\tPassword:\t");
                 password = PasswordHandling.GetPassword();
             }
-            Password = PasswordHandling.SecureStringToString(password, UserName);
+            Password = PasswordHandling.PasswordToHash(password, UserName);
         }
 
         private bool IsWrongPassword(SecureString password, bool isNewUser)
@@ -121,8 +126,10 @@ namespace Project1Afdemp
         private bool IDmatched(SecureString password)
         {
             string passHash = UserDatabase.Users.Single(i => i.UserName == UserName).Password;
-            return (PasswordHandling.SecureStringToString(password, UserName) == passHash);
+            string givenPass = PasswordHandling.PasswordToHash(password, UserName);
+            return (givenPass == passHash);
         }
+        #endregion
 
         private void SetAccessibility()
         {

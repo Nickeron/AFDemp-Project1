@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security;
-using System.Data.Entity;
 
 namespace Project1Afdemp
 {
@@ -20,7 +18,7 @@ namespace Project1Afdemp
         public static UserManager LoginScreen()
         {
             UserManager activeUser;
-            string[] signOrLogItems = { "Sign Up", "Log In" };
+            List<string> signOrLogItems = new List<string>{ "Sign Up", "Log In" };
             short userChoice = Menus.HorizontalMenu(StringsFormatted.Welcome, signOrLogItems);
             using (var database = new DatabaseStuff())
             {
@@ -31,14 +29,12 @@ namespace Project1Afdemp
                 else
                 {
                     activeUser = new UserManager(true);
-
                     try
                     {
                         database.Users.Add(activeUser.TheUser);
                         database.SaveChanges();
                     }
                     catch (Exception e) { Console.WriteLine(e); }
-
                 }
             }
             Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUser.UserName}");
@@ -47,14 +43,14 @@ namespace Project1Afdemp
 
         public static void MainMenu(UserManager activeUser)
         {
-            string[] mainMenuItems;
+            List<string> mainMenuItems;
             if (activeUser.UserAccess == Accessibility.administrator)
             {
-                mainMenuItems = new string[] { "Send Email", "Read Received", "Transaction History" , "Manage Users"};
+                mainMenuItems = new List<string> { "Send Email", "Read Received", "Transaction History" , "Manage Users"};
             }
             else
             {
-                mainMenuItems = new string[] { "Send Email", "Read Received", "Transaction History" };
+                mainMenuItems = new List<string> { "Send Email", "Read Received", "Transaction History" };
             }
             
             short userChoice = Menus.VerticalMenu(StringsFormatted.MainMenu, mainMenuItems);
@@ -86,45 +82,40 @@ namespace Project1Afdemp
 
         public static void SendEmail(UserManager activeUser)
         {
+            List<string> sendEmailItems = new List<string>();
             using (var database = new DatabaseStuff())
             {
-                // Display all Blogs from the database 
                 var query = from user in database.Users
                             orderby user.UserName
                             select user;
                 try
                 {
-                    Console.WriteLine("All users in the database:");
                     foreach (User user in query)
                     {
-                        Console.WriteLine(user.UserName);
+                        sendEmailItems.Add(user.UserName);
                     }
                 }
                 catch (Exception e) { Console.WriteLine(e); }
-                
-
-                Console.WriteLine("Press any key to exit...");
-                Console.ReadKey();
             }
-            string[] sendEmailItems = new string[] { "Send Email", "Read Received", "Transaction History" };
+            sendEmailItems.Add("back");
             short userChoice = Menus.VerticalMenu(StringsFormatted.SendEmail, sendEmailItems);
         }
 
         public static void ReadReceived(UserManager activeUser)
         {
-            string[] readEmailItems = new string[] { "Send Email", "Read Received", "Transaction History" };
+            List<string> readEmailItems = new List<string> { "Send Email", "Read Received", "Transaction History" };
             short userChoice = Menus.VerticalMenu(StringsFormatted.ReadEmails, readEmailItems);
         }
 
         public static void TransactionHistory(UserManager activeUser)
         {
-            string[] historyItems = new string[] { "Send Email", "Read Received", "Transaction History" };
+            List<string> historyItems = new List<string> { "Send Email", "Read Received", "Transaction History" };
             short userChoice = Menus.VerticalMenu(StringsFormatted.History, historyItems);
         }
 
         public static void ManageUsers(UserManager activeUser)
         {
-            string[] manageUsersItems = new string[] { "Send Email", "Read Received", "Transaction History" };
+            List<string> manageUsersItems = new List<string> { "Send Email", "Read Received", "Transaction History" };
             short userChoice = Menus.VerticalMenu(StringsFormatted.ManageUsers, manageUsersItems);
         }
 

@@ -6,7 +6,6 @@ namespace Project1Afdemp
     {
         public DatabaseStuff() : base("Users")
         {
-            //Database.SetInitializer(new MigrateDatabaseToLatestVersion<DatabaseStuff, EF6Console.Migrations.Configuration>());
         }
         public DbSet<User> Users { get; set; }
         public DbSet<Message> Messages { get; set; }

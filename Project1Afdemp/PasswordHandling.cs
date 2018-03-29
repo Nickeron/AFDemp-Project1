@@ -8,36 +8,34 @@ namespace Project1Afdemp
 {
     static class PasswordHandling
     {
-        public static String SecureStringToString(SecureString password, string username)
+        public static String PasswordToHash(SecureString password, string username)
         {
             StringBuilder StringBuild = new StringBuilder();
             IntPtr valuePtr = IntPtr.Zero;
             try
             {
                 valuePtr = Marshal.SecureStringToGlobalAllocUnicode(password);
-                Marshal.PtrToStringUni(valuePtr);
+                string pass = Marshal.PtrToStringUni(valuePtr);
                 using (SHA256 hash = SHA256.Create())
                 {
                     Encoding enc = Encoding.UTF8;
 
-                    //the user id is the salt. 
-                    //So 2 users with same password have different hashes. 
-                    //For example if someone knows his own hash he can't see who has same password
-                    string input = password + username;
+                    // The username is the salt. 
+                    // So 2 users with same password have different hashes. 
+                    // For example if someone knows his own hash he can't see who has same password
+                    string input = pass + username;
 
                     Byte[] result = hash.ComputeHash(enc.GetBytes(input));
                     
                     foreach (Byte b in result)
-                        StringBuild.Append(b.ToString("x2")); //You could also use other encodingslike BASE64 
+                        StringBuild.Append(b.ToString("x2")); // Can also use other encodings like BASE64 
                 }
                 return StringBuild.ToString();
             }
             finally
             {
                 Marshal.ZeroFreeGlobalAllocUnicode(valuePtr);
-            }
-
-            
+            }   
         }
 
         public static bool SecureCompare(this SecureString ss1, SecureString ss2)
