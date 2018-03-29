@@ -33,12 +33,12 @@ namespace Project1Afdemp
                 }
                 keyInfo = Console.ReadKey(true);
                
-                if (keyInfo.Key.ToString() == "UpArrow")
+                if (keyInfo.Key.ToString() == "DownArrow")
                 {
                     currentItem++;
                     if (currentItem > menuItems.Length - 1) currentItem = 0;
                 }
-                else if (keyInfo.Key.ToString() == "DownArrow")
+                else if (keyInfo.Key.ToString() == "UpArrow")
                 {
                     currentItem--;
                     if (currentItem < 0) currentItem = Convert.ToInt16(menuItems.Length - 1);
