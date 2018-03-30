@@ -65,10 +65,6 @@
     <Compile Include="Migrations\201803300529110_forkeys.Designer.cs">
       <DependentUpon>201803300529110_forkeys.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201803301406490_deleteusers.cs" />
-    <Compile Include="Migrations\201803301406490_deleteusers.Designer.cs">
-      <DependentUpon>201803301406490_deleteusers.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="PasswordHandling.cs" />
     <Compile Include="Program.cs" />
@@ -92,9 +88,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201803300529110_forkeys.resx">
       <DependentUpon>201803300529110_forkeys.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201803301406490_deleteusers.resx">
-      <DependentUpon>201803301406490_deleteusers.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
