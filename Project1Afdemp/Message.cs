@@ -18,8 +18,8 @@ namespace Project1Afdemp
         public virtual User Sender { get; set; }
         public virtual User Receiver { get; set; }
 
-        private Message() { }
-        
+        public Message() { }
+
         public Message(int senderid, int receiverid, string title, string body)
         {
             SenderId = senderid;

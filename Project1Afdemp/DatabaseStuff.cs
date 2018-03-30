@@ -9,6 +9,9 @@ namespace Project1Afdemp
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<User>()
+                        .HasKey(m => m.Id);
+
             modelBuilder.Entity<Message>()
                         .HasRequired(m => m.Sender)
                         .WithMany(t => t.SentMessages)

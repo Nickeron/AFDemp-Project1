@@ -93,13 +93,13 @@ namespace Project1Afdemp
 
             using (var database = new DatabaseStuff())
             {
-                Message email = new Message(activeUser.TheUser.Id, receiver.Id, MessageTitle, MessageBody);
+                int senderId = database.Users.Single(i => i.UserName == activeUser.UserName).Id;
+                Message email = new Message(senderId, receiver.Id, MessageTitle, MessageBody);
                 try
                 {
                     database.Messages.Add(email);
-                    Console.WriteLine("Adding the email SUCCESS!!!!" + receiver.UserName);
-                    database.SaveChangesAsync();
-                    Console.WriteLine("Email sent successfully to" + receiver.UserName);
+                    database.SaveChanges();
+                    Console.Write($"\n\n\tEmail sent successfully to {receiver.UserName}\nOK");
                 }
                 catch (Exception e) { Console.WriteLine(e); }
                 Console.ReadKey();
@@ -108,9 +108,10 @@ namespace Project1Afdemp
 
         public static void ReadReceived(UserManager activeUser)
         {
-            List<string> readEmailItems = new List<string> ();
-
-            string userChoice = Menus.VerticalMenu(StringsFormatted.ReadEmails, readEmailItems);
+            Message receivedMessage = SelectMessage(activeUser);
+            if (receivedMessage is null) { return; }
+            Console.Write($"\n\n\tTitle: {receivedMessage.Title}\n\n\tBody: {receivedMessage.Body}\n\n\tOK");
+            Console.ReadKey();
         }
 
         public static void TransactionHistory(UserManager activeUser)
@@ -149,5 +150,40 @@ namespace Project1Afdemp
                 return database.Users.Single(i => i.UserName == sUser);
             }
         }
+
+        public static Message SelectMessage(UserManager activeUser)
+        {
+            List<string> selectMessageItems = new List<string>();
+            using (var database = new DatabaseStuff())
+            {
+                List<Message> messages = database.Messages.ToList();
+                int receiverId = database.Users.Single(i => i.UserName == activeUser.UserName).Id;
+                try
+                {
+                    foreach (Message message in messages)
+                    {
+                        if (message.ReceiverId == receiverId)
+                        {
+                            selectMessageItems.Add($"ID: |{message.Id}| From: |{message.SenderId}| Title: |{message.Title}| Time Sent: |{message.TimeSent}|");
+                        }
+                    }
+                }
+                catch (Exception e) { Console.WriteLine(e); }
+
+                if(selectMessageItems.Count == 0)
+                {
+                    Console.WriteLine("\n\n\tNo Messages to View");
+                    Console.ReadKey();
+                    return null;
+                }
+                string oMessage = Menus.VerticalMenu(StringsFormatted.OpenMessage, selectMessageItems);
+                string[] selParameters = oMessage.Split('|');
+                int messageID = int.Parse(selParameters[1]);
+
+                Console.Clear();
+                return database.Messages.Single(i => i.Id == messageID);
+            }
+        }
+
     }
 }
