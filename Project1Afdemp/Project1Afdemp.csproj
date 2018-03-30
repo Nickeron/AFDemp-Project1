@@ -57,9 +57,13 @@
     <Compile Include="DatabaseStuff.cs" />
     <Compile Include="Menus.cs" />
     <Compile Include="Message.cs" />
-    <Compile Include="Migrations\201803291732214_createUserAndMessage.cs" />
-    <Compile Include="Migrations\201803291732214_createUserAndMessage.Designer.cs">
-      <DependentUpon>201803291732214_createUserAndMessage.cs</DependentUpon>
+    <Compile Include="Migrations\201803292021076_createUser.cs" />
+    <Compile Include="Migrations\201803292021076_createUser.Designer.cs">
+      <DependentUpon>201803292021076_createUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803300529110_forkeys.cs" />
+    <Compile Include="Migrations\201803300529110_forkeys.Designer.cs">
+      <DependentUpon>201803300529110_forkeys.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="PasswordHandling.cs" />
@@ -71,12 +75,19 @@
     <Compile Include="UserManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201803291732214_createUserAndMessage.resx">
-      <DependentUpon>201803291732214_createUserAndMessage.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201803292021076_createUser.resx">
+      <DependentUpon>201803292021076_createUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803300529110_forkeys.resx">
+      <DependentUpon>201803300529110_forkeys.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

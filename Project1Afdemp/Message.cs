@@ -7,18 +7,23 @@ namespace Project1Afdemp
     public class Message
     {
         public int Id { get; set; }
-        public User Sender { get; set; }
-        public User Receiver { get; set; }
+
         public DateTime TimeSent { get; set; }
         public string Title { get; set; }
         public string Body { get; set; }
 
-        private Message() { }
+        public int SenderId { get; set; }
+        public int ReceiverId { get; set; }
 
-        public Message(User sender, User receiver, string title, string body)
+        public virtual User Sender { get; set; }
+        public virtual User Receiver { get; set; }
+
+        private Message() { }
+        
+        public Message(int senderid, int receiverid, string title, string body)
         {
-            Sender = sender;
-            Receiver = receiver;
+            SenderId = senderid;
+            ReceiverId = receiverid;
             Title = title;
             Body = body;
             TimeSent = DateTime.Now;

@@ -83,21 +83,26 @@ namespace Project1Afdemp
         public static void SendEmail(UserManager activeUser)
         {
             User receiver = SelectUser(activeUser);
+
             Console.WriteLine(StringsFormatted.SendEmail);
             Console.Write("\n\n\tTitle: ");
             string MessageTitle = Console.ReadLine();
+
             Console.Write("\n\tBody: ");
             string MessageBody = Console.ReadLine();
+
             using (var database = new DatabaseStuff())
             {
-                Message email = new Message(activeUser.TheUser, receiver, MessageTitle, MessageBody);
+                Message email = new Message(activeUser.TheUser.Id, receiver.Id, MessageTitle, MessageBody);
                 try
                 {
                     database.Messages.Add(email);
-                    //database.SaveChanges();
-                    Console.WriteLine("Email sent successfully to"+receiver.UserName);
+                    Console.WriteLine("Adding the email SUCCESS!!!!" + receiver.UserName);
+                    database.SaveChangesAsync();
+                    Console.WriteLine("Email sent successfully to" + receiver.UserName);
                 }
                 catch (Exception e) { Console.WriteLine(e); }
+                Console.ReadKey();
             }
         }
 
@@ -125,21 +130,19 @@ namespace Project1Afdemp
             List<string> selectUserItems = new List<string>();
             using (var database = new DatabaseStuff())
             {
-                var query = from user in database.Users
-                            orderby user.UserName
-                            select user;
+                List<User> users = database.Users.ToList();
+
                 try
                 {
-                    foreach (User user in query)
+                    foreach (User user in users)
                     {
                         if (user.UserName != activeUser.UserName)
                         {
                             selectUserItems.Add(user.UserName);
-                        }
+                        }                        
                     }
                 }
                 catch (Exception e) { Console.WriteLine(e); }
-
                 string sUser = Menus.VerticalMenu(StringsFormatted.SelectUser, selectUserItems);
 
                 Console.Clear();
