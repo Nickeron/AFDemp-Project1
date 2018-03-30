@@ -99,7 +99,7 @@ namespace Project1Afdemp
                 {
                     database.Messages.Add(email);
                     database.SaveChanges();
-                    Console.Write($"\n\n\tEmail sent successfully to {receiver.UserName}\nOK");
+                    Console.Write($"\n\n\tEmail sent successfully to {receiver.UserName}\n\tOK");
                 }
                 catch (Exception e) { Console.WriteLine(e); }
                 Console.ReadKey();
@@ -116,8 +116,27 @@ namespace Project1Afdemp
 
         public static void TransactionHistory(UserManager activeUser)
         {
-            List<string> historyItems = new List<string> { "Send Email", "Read Received", "Transaction History" };
-            string userChoice = Menus.VerticalMenu(StringsFormatted.History, historyItems);
+            Console.Clear();
+            Console.WriteLine(StringsFormatted.History+'\n');
+            using (var database = new DatabaseStuff())
+            {
+                List<Message> messages = database.Messages.ToList();
+                int receiverId = database.Users.Single(i => i.UserName == activeUser.UserName).Id;
+                string senderName;
+                string receiverName;
+                try
+                {
+                    foreach (Message message in messages)
+                    {
+                        senderName = database.Users.Single(i => i.Id == message.SenderId).UserName;
+                        receiverName = database.Users.Single(i => i.Id == message.ReceiverId).UserName;
+                        Console.WriteLine($"\tAt {message.TimeSent}, {senderName} sent a mail to {receiverName} with a title: '{message.Title}'");
+                    }
+                }
+                catch (Exception e) { Console.WriteLine(e); }
+                Console.Write("\n\n\tOK");
+                Console.ReadKey();
+            }
         }
 
         public static void ManageUsers(UserManager activeUser)
@@ -158,13 +177,15 @@ namespace Project1Afdemp
             {
                 List<Message> messages = database.Messages.ToList();
                 int receiverId = database.Users.Single(i => i.UserName == activeUser.UserName).Id;
+                string senderName;
                 try
                 {
                     foreach (Message message in messages)
                     {
                         if (message.ReceiverId == receiverId)
                         {
-                            selectMessageItems.Add($"ID: |{message.Id}| From: |{message.SenderId}| Title: |{message.Title}| Time Sent: |{message.TimeSent}|");
+                            senderName = database.Users.Single(i => i.Id == message.SenderId).UserName;
+                            selectMessageItems.Add($"ID: |{message.Id}| From: |{senderName}| Title: |{message.Title}| Time Sent: |{message.TimeSent}|");
                         }
                     }
                 }
