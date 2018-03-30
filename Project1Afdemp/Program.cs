@@ -83,7 +83,7 @@ namespace Project1Afdemp
         public static void SendEmail(UserManager activeUser)
         {
             User receiver = SelectUser(activeUser);
-
+            if (receiver is null) { return; }
             Console.WriteLine(StringsFormatted.SendEmail);
             Console.Write("\n\n\tTitle: ");
             string MessageTitle = Console.ReadLine();
@@ -163,6 +163,12 @@ namespace Project1Afdemp
                     }
                 }
                 catch (Exception e) { Console.WriteLine(e); }
+                if (selectUserItems.Count == 0)
+                {
+                    Console.WriteLine("\n\n\tNo users in database!");
+                    Console.ReadKey();
+                    return null;
+                }
                 string sUser = Menus.VerticalMenu(StringsFormatted.SelectUser, selectUserItems);
 
                 Console.Clear();
