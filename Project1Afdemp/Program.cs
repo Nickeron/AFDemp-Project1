@@ -141,8 +141,16 @@ namespace Project1Afdemp
 
         public static void ManageUsers(UserManager activeUser)
         {
-            List<string> manageUsersItems = new List<string> { "Send Email", "Read Received", "Transaction History" };
-            string userChoice = Menus.VerticalMenu(StringsFormatted.ManageUsers, manageUsersItems);
+            User receiver = SelectUser(activeUser);
+            if (receiver is null) { return; }
+            List<string> ChangeUserItems = new List<string> { "Permissions", "Delete User" };
+            string choice = Menus.VerticalMenu(StringsFormatted.ManageUsers, ChangeUserItems);
+            if(choice == "Delete User")
+            {
+                DeleteUser(receiver);
+                return;
+            }
+            //ChangeUserPermissions(receiver);
         }
 
         public static User SelectUser(UserManager activeUser)
@@ -209,6 +217,23 @@ namespace Project1Afdemp
 
                 Console.Clear();
                 return database.Messages.Single(i => i.Id == messageID);
+            }
+        }
+
+        public static void DeleteUser(User delUser)
+        {
+            if (Menus.HorizontalMenu("Are you sure you want to delete this user?", new List<string>{ "Yes","No"}).Contains('Y'))
+            {
+                using (var database = new DatabaseStuff())
+                {
+                    database.Users.Remove(database.Users.Single(i => i.UserName == delUser.UserName));
+                    var query = database.Messages.Where(i => i.ReceiverId == delUser.Id || i.SenderId == delUser.Id);
+                    foreach(var item in query)
+                    {
+                        database.Messages.Remove(item);
+                    }
+                    database.SaveChanges();                       
+                }
             }
         }
 
