@@ -143,14 +143,16 @@ namespace Project1Afdemp
         {
             User receiver = SelectUser(activeUser);
             if (receiver is null) { return; }
-            List<string> ChangeUserItems = new List<string> { "Permissions", "Delete User" };
+            List<string> ChangeUserItems = new List<string> { "Permissions", "Delete User", "Back" };
             string choice = Menus.VerticalMenu(StringsFormatted.ManageUsers, ChangeUserItems);
             if(choice == "Delete User")
             {
                 DeleteUser(receiver);
-                return;
             }
-            //ChangeUserPermissions(receiver);
+            else if (choice == "Permissions")
+            {
+                ChangeUserPermissions(receiver);
+            }
         }
 
         public static User SelectUser(UserManager activeUser)
@@ -236,6 +238,44 @@ namespace Project1Afdemp
                 }
             }
         }
+
+        public static void ChangeUserPermissions(User chUser)
+        {
+            List<string> manageUserItems;
+            if (chUser.UserAccess == Accessibility.administrator)
+            {
+                manageUserItems = new List<string>() { "downgrade to USER", "downgrade to GUEST" };
+            }
+            else if(chUser.UserAccess == Accessibility.user)
+            {
+                manageUserItems = new List<string>() { "upgrade to ADMINISTRATOR", "downgrade to GUEST" };
+            }
+            else
+            {
+                manageUserItems = new List<string>() { "upgrade to ADMINISTRATOR", "upgrade to USER" };
+            }
+            string change = Menus.VerticalMenu($"\n\n\t{chUser.UserName} is {chUser.UserAccess}, how do you want to change his permissions?", manageUserItems);
+            using (var database = new DatabaseStuff())
+            {
+                User toChange = database.Users.Single(i => i.UserName == chUser.UserName);
+                if (change.Contains("ADMINISTRATOR"))
+                {
+                    toChange.UserAccess = Accessibility.administrator;
+                }
+                else if (change.Contains("USER"))
+                {
+                    toChange.UserAccess = Accessibility.user;
+                }
+                else
+                {
+                    toChange.UserAccess = Accessibility.guest;
+                }
+                database.SaveChanges();
+            }
+            Console.Write($"\n\n\tYou did {change}, the user: {chUser.UserName}\n\n\t\tOK");
+            Console.ReadKey();
+        }
+
 
     }
 }

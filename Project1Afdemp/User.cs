@@ -10,7 +10,7 @@ namespace Project1Afdemp
 
         public string UserName { get; private set; }
         public string Password { get; private set; }
-        public Accessibility UserAccess { get; private set; }
+        public Accessibility UserAccess { get; set; }
 
         private User() { }
 
