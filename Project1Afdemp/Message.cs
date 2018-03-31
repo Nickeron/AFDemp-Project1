@@ -1,6 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Project1Afdemp
 {
@@ -15,6 +13,7 @@ namespace Project1Afdemp
         public int SenderId { get; set; }
         public int ReceiverId { get; set; }
 
+        // Virtual in this context means nullable
         public virtual User Sender { get; set; }
         public virtual User Receiver { get; set; }
 

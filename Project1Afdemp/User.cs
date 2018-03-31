@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Project1Afdemp
 {
@@ -14,6 +12,7 @@ namespace Project1Afdemp
 
         private User() { }
 
+        // Virtual in this context means nullable
         public virtual ICollection<Message> ReceivedMessages { get; set; }
         public virtual ICollection<Message> SentMessages { get; set; }
 

@@ -8,8 +8,12 @@ namespace Project1Afdemp
     {
         static void Main(string[] args)
         {
-            UserManager activeUser = LoginScreen();
-            MainMenu(activeUser);
+            UserManager activeUser;
+            while (true)
+            {
+                activeUser = LoginScreen();
+                MainMenu(activeUser);
+            }
         }
 
         public static UserManager LoginScreen()
@@ -40,7 +44,7 @@ namespace Project1Afdemp
 
         public static void MainMenu(UserManager activeUser)
         {
-            List<string> mainMenuItems = new List<string> { "Send Email", "Read Received", "Transaction History", "Exit" };
+            List<string> mainMenuItems = new List<string> { "Send Email", "Read Received", "Transaction History", "Log Out", "Exit" };
             if (activeUser.UserAccess == Accessibility.administrator)
             {
                 mainMenuItems.Insert(3, "Manage Users");
@@ -70,6 +74,10 @@ namespace Project1Afdemp
                         {
                             ManageUsers(activeUser);
                             break;
+                        }
+                    case "Log Out":
+                        {
+                            return;
                         }
                     case "Exit":
                         {
@@ -143,7 +151,7 @@ namespace Project1Afdemp
         {
             User receiver = SelectUser(activeUser);
             if (receiver is null) { return; }
-            List<string> ChangeUserItems = new List<string> { "Permissions", "Delete User", "Back" };
+            List<string> ChangeUserItems = new List<string> { "Permissions", "Create NEW user", "Delete User", "Back" };
             string choice = Menus.VerticalMenu(StringsFormatted.ManageUsers, ChangeUserItems);
             if(choice == "Delete User")
             {
@@ -152,6 +160,19 @@ namespace Project1Afdemp
             else if (choice == "Permissions")
             {
                 ChangeUserPermissions(receiver);
+            }
+            else if (choice == "Create NEW user")
+            {
+                using (var database = new DatabaseStuff())
+                {
+                    UserManager newUser = new UserManager(true);
+                    try
+                    {
+                        database.Users.Add(newUser.TheUser);
+                        database.SaveChanges();
+                    }
+                    catch (Exception e) { Console.WriteLine(e); }
+                }
             }
         }
 
@@ -275,7 +296,5 @@ namespace Project1Afdemp
             Console.Write($"\n\n\tYou did {change}, the user: {chUser.UserName}\n\n\t\tOK");
             Console.ReadKey();
         }
-
-
     }
 }
