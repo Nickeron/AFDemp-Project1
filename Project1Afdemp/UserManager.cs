@@ -36,8 +36,9 @@ namespace Project1Afdemp
             {
                 Password = PasswordHandling.PasswordToHash(password, UserName);
             }
-            SetAccessibility();
-            TheUser = new User(UserName, Password, UserAccess);
+            SetAccessibility(isNewUser);
+            // If is new user create a user, else get the user from database
+            TheUser = (isNewUser)?new User(UserName, Password, UserAccess): UserDatabase.Users.Single(u => u.UserName == UserName);
         }
 
         public UserManager(bool isNewUser = false) : this("", new SecureString(), isNewUser) { }
@@ -131,20 +132,28 @@ namespace Project1Afdemp
         }
         #endregion
 
-        private void SetAccessibility()
+        private void SetAccessibility(bool isNewUser)
         {
-            if (UserName == "admin")
+            if (isNewUser)
             {
-                UserAccess = Accessibility.administrator;
-            }
-            else if (UserName == "guest")
-            {
-                UserAccess = Accessibility.guest;
+                if (UserName == "admin")
+                {
+                    UserAccess = Accessibility.administrator;
+                }
+                else if (UserName == "guest")
+                {
+                    UserAccess = Accessibility.guest;
+                }
+                else
+                {
+                    UserAccess = Accessibility.user;
+                }
             }
             else
             {
-                UserAccess = Accessibility.user;
+                UserAccess = UserDatabase.Users.Single(u => u.UserName == UserName).UserAccess;
             }
+            
         }
 
     }

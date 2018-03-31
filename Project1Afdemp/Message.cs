@@ -9,6 +9,7 @@ namespace Project1Afdemp
         public DateTime TimeSent { get; set; }
         public string Title { get; set; }
         public string Body { get; set; }
+        public bool IsRead { get; set; }
 
         public int SenderId { get; set; }
         public int ReceiverId { get; set; }
@@ -26,6 +27,7 @@ namespace Project1Afdemp
             Title = title;
             Body = body;
             TimeSent = DateTime.Now;
+            IsRead = false;
         }
     }
 }

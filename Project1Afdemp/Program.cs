@@ -38,54 +38,59 @@ namespace Project1Afdemp
                     catch (Exception e) { Console.WriteLine(e); }
                 }
             }
-            Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUser.UserName}");
+            Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUser.UserAccess} {activeUser.UserName}");
+            Console.ReadKey();
             return activeUser;
         }
 
         public static void MainMenu(UserManager activeUser)
         {
-            List<string> mainMenuItems = new List<string> { "Send Email", "Read Received", "Transaction History", "Log Out", "Exit" };
-            if (activeUser.UserAccess == Accessibility.administrator)
-            {
-                mainMenuItems.Insert(3, "Manage Users");
-            }
             while (true)
             {
-                string userChoice = Menus.VerticalMenu(StringsFormatted.MainMenu, mainMenuItems);
-
-                switch (userChoice)
+                using (var database = new DatabaseStuff())
                 {
-                    case "Send Email":
-                        {
-                            SendEmail(activeUser);
-                            break;
-                        }
-                    case "Read Received":
-                        {
-                            ReadReceived(activeUser);
-                            break;
-                        }
-                    case "Transaction History":
-                        {
-                            TransactionHistory(activeUser);
-                            break;
-                        }
-                    case "Manage Users":
-                        {
-                            ManageUsers(activeUser);
-                            break;
-                        }
-                    case "Log Out":
-                        {
-                            return;
-                        }
-                    case "Exit":
-                        {
-                            Environment.Exit(0);
-                            break;
-                        }
+                    int unreadMessages = database.Messages.Count(m => m.IsRead == false && m.Receiver.Id == activeUser.TheUser.Id);
+                    List<string> mainMenuItems = new List<string> { "Send Email", $"Read Received ({unreadMessages})", "Transaction History", "Log Out", "Exit" };
+
+                    if (activeUser.UserAccess == Accessibility.administrator)
+                    {
+                        mainMenuItems.Insert(3, "Manage Users");
+                        mainMenuItems.Insert(4, "Create NEW User");
+                    }
+
+                    string userChoice = Menus.VerticalMenu(StringsFormatted.MainMenu, mainMenuItems);
+
+                    if (userChoice.Contains("Send Email"))
+                    {
+                        SendEmail(activeUser);
+                    }
+                    else if (userChoice.Contains("Read Received"))
+                    {
+                        ReadReceived(activeUser);
+
+                    }
+                    else if (userChoice.Contains("Transaction History"))
+                    {
+                        TransactionHistory(activeUser);
+                    }
+                    else if (userChoice.Contains("Manage Users"))
+                    {
+                        ManageUsers(activeUser);
+                    }
+                    else if (userChoice.Contains("Create NEW User"))
+                    {
+                        CreateNewUser();
+                    }
+                    else if (userChoice.Contains("Log Out"))
+                    {
+                        return;
+                    }
+                    else if (userChoice.Contains("Exit"))
+                    {
+                        Environment.Exit(0);
+                    }
                 }
-            } 
+            }
         }
 
         public static void SendEmail(UserManager activeUser)
@@ -119,6 +124,12 @@ namespace Project1Afdemp
             Message receivedMessage = SelectMessage(activeUser);
             if (receivedMessage is null) { return; }
             Console.Write($"\n\n\tTitle: {receivedMessage.Title}\n\n\tBody: {receivedMessage.Body}\n\n\tOK");
+            using (var database = new DatabaseStuff())
+            {
+                Message readMessage = database.Messages.Single(m => m.Id == receivedMessage.Id);
+                readMessage.IsRead = true;
+                database.SaveChanges();
+            }
             Console.ReadKey();
         }
 
@@ -151,7 +162,7 @@ namespace Project1Afdemp
         {
             User receiver = SelectUser(activeUser);
             if (receiver is null) { return; }
-            List<string> ChangeUserItems = new List<string> { "Permissions", "Create NEW user", "Delete User", "Back" };
+            List<string> ChangeUserItems = new List<string> { "Permissions", "Delete User", "Back" };
             string choice = Menus.VerticalMenu(StringsFormatted.ManageUsers, ChangeUserItems);
             if(choice == "Delete User")
             {
@@ -161,18 +172,19 @@ namespace Project1Afdemp
             {
                 ChangeUserPermissions(receiver);
             }
-            else if (choice == "Create NEW user")
+        }
+
+        public static void CreateNewUser()
+        {
+            using (var database = new DatabaseStuff())
             {
-                using (var database = new DatabaseStuff())
+                UserManager newUser = new UserManager(true);
+                try
                 {
-                    UserManager newUser = new UserManager(true);
-                    try
-                    {
-                        database.Users.Add(newUser.TheUser);
-                        database.SaveChanges();
-                    }
-                    catch (Exception e) { Console.WriteLine(e); }
+                    database.Users.Add(newUser.TheUser);
+                    database.SaveChanges();
                 }
+                catch (Exception e) { Console.WriteLine(e); }
             }
         }
 
@@ -265,15 +277,15 @@ namespace Project1Afdemp
             List<string> manageUserItems;
             if (chUser.UserAccess == Accessibility.administrator)
             {
-                manageUserItems = new List<string>() { "downgrade to USER", "downgrade to GUEST" };
+                manageUserItems = new List<string>() { "downgrade to USER", "downgrade to GUEST" ,"Back"};
             }
             else if(chUser.UserAccess == Accessibility.user)
             {
-                manageUserItems = new List<string>() { "upgrade to ADMINISTRATOR", "downgrade to GUEST" };
+                manageUserItems = new List<string>() { "upgrade to ADMINISTRATOR", "downgrade to GUEST", "Back" };
             }
             else
             {
-                manageUserItems = new List<string>() { "upgrade to ADMINISTRATOR", "upgrade to USER" };
+                manageUserItems = new List<string>() { "upgrade to ADMINISTRATOR", "upgrade to USER", "Back" };
             }
             string change = Menus.VerticalMenu($"\n\n\t{chUser.UserName} is {chUser.UserAccess}, how do you want to change his permissions?", manageUserItems);
             using (var database = new DatabaseStuff())
@@ -287,9 +299,13 @@ namespace Project1Afdemp
                 {
                     toChange.UserAccess = Accessibility.user;
                 }
-                else
+                else if (change.Contains("GUEST"))
                 {
                     toChange.UserAccess = Accessibility.guest;
+                }
+                else
+                {
+                    return;
                 }
                 database.SaveChanges();
             }
