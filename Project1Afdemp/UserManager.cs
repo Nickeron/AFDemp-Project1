@@ -191,5 +191,11 @@ namespace Project1Afdemp
             
         }
 
+        public void ClearUnreadChat()
+        {
+            TheUser.IdsUnreadChatMessages = "";
+            UserDatabase.SaveChanges();
+        }
+
     }
 }

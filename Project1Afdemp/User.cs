@@ -9,6 +9,7 @@ namespace Project1Afdemp
         public string UserName { get; private set; }
         public string Password { get; private set; }
         public Accessibility UserAccess { get; set; }
+        public string IdsUnreadChatMessages { get; set; }
 
         private User() { }
 
@@ -23,6 +24,7 @@ namespace Project1Afdemp
             UserName = username;
             Password = password;
             UserAccess = userAccess;
+            IdsUnreadChatMessages = "";
         }
     }
 }

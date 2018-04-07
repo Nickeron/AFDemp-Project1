@@ -62,6 +62,10 @@
     <Compile Include="Migrations\201804071607044_FirstMigration.Designer.cs">
       <DependentUpon>201804071607044_FirstMigration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201804071835078_UnreadMessages.cs" />
+    <Compile Include="Migrations\201804071835078_UnreadMessages.Designer.cs">
+      <DependentUpon>201804071835078_UnreadMessages.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="PasswordHandling.cs" />
     <Compile Include="Program.cs" />
@@ -82,6 +86,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201804071607044_FirstMigration.resx">
       <DependentUpon>201804071607044_FirstMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804071835078_UnreadMessages.resx">
+      <DependentUpon>201804071835078_UnreadMessages.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
