@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Security;
 
 namespace Project1Afdemp
 {
@@ -31,7 +30,7 @@ namespace Project1Afdemp
                 UserName = userName;
             }
             LoginTries = 1;
-            if (IsWrongPassword(PasswordHandling.ConvertToSecureString(password), isNewUser))
+            if (IsWrongPassword(password, isNewUser))
             {
                 AskPassword(isNewUser);
             }
@@ -76,6 +75,12 @@ namespace Project1Afdemp
                 Console.ResetColor();
                 return true;
             }
+            else if (userName.Contains(' '))
+            {
+                Console.Write("\n\n\tUser Name cannot contain spaces! Try again");
+                Console.ResetColor();
+                return true;
+            }
             else if (UserNameAlreadyExists(userName) && isNewUser)
             {
                 Console.Write("\n\n\tUser Name already exists! Try another");
@@ -103,7 +108,7 @@ namespace Project1Afdemp
         {
             Console.Clear();
             Console.Write("\n\n\tPassword:\t");
-            var password = PasswordHandling.GetPassword();
+            string password = PasswordHandling.GetPassword();
             while (IsWrongPassword(password, isNewUser) && LoginTries < 3)
             {
                 Console.Write("\n\n\tPassword:\t");
@@ -114,16 +119,22 @@ namespace Project1Afdemp
             {
                 throw new ArgumentException("\n\n\tToo many false attempts");
             }
-            Password = PasswordHandling.PasswordToHash(password, UserName);
+            Password = PasswordHandling.PasswordToHash(PasswordHandling.ConvertToSecureString(password), UserName);
         }
 
-        private bool IsWrongPassword(SecureString password, bool isNewUser)
+        private bool IsWrongPassword(string password, bool isNewUser)
         {
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Red;
             if (password.Length < 5 || password.Length > 20)
             {
                 Console.Write("\n\n\tPassword has to be between 5 and 20 characters long!");
+                Console.ResetColor();
+                return true;
+            }
+            else if (password.Contains(' '))
+            {
+                Console.Write("\n\n\tPassword cannot contain spaces! Try again");
                 Console.ResetColor();
                 return true;
             }
@@ -137,10 +148,10 @@ namespace Project1Afdemp
             return false;
         }
 
-        private bool IDmatched(SecureString password)
+        private bool IDmatched(string password)
         {
             string passHash = UserDatabase.Users.Single(i => i.UserName == UserName).Password;
-            string givenPass = PasswordHandling.PasswordToHash(password, UserName);
+            string givenPass = PasswordHandling.PasswordToHash(PasswordHandling.ConvertToSecureString(password), UserName);
             return (givenPass == passHash);
         }
         #endregion

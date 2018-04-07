@@ -272,12 +272,22 @@ namespace Project1Afdemp
                 string senderName;
                 try
                 {
+                    string listedMessage;
                     foreach (Message message in messages)
                     {
                         if (message.ReceiverId == receiverId)
                         {
                             senderName = database.Users.Single(i => i.Id == message.SenderId).UserName;
-                            selectMessageItems.Add($"ID: |{message.Id}| From: |{senderName}| Title: |{message.Title}| Time Sent: |{message.TimeSent}|");
+                            if (!message.IsRead)
+                            {
+                                listedMessage = "* ";
+                            }
+                            else
+                            {
+                                listedMessage = "";
+                            }
+                            listedMessage += $"ID: |{message.Id}| From: |{senderName}| Title: |{message.Title}| Time Sent: |{message.TimeSent}|";
+                            selectMessageItems.Add(listedMessage);
                         }
                     }
                 }

@@ -67,9 +67,9 @@ namespace Project1Afdemp
             }
         }
 
-        public static SecureString GetPassword()
+        public static String GetPassword()
         {
-            var password = new SecureString();
+            string password = "";
             while (true)
             {
                 ConsoleKeyInfo keyPressed = Console.ReadKey(true);
@@ -81,13 +81,13 @@ namespace Project1Afdemp
                 {
                     if (password.Length > 0)
                     {
-                        password.RemoveAt(password.Length - 1);
+                        password.Remove(password.Length - 1);
                         Console.Write("\b \b");
                     }
                 }
                 else
                 {
-                    password.AppendChar(keyPressed.KeyChar);
+                    password += keyPressed.KeyChar;
                     Console.Write("*");
                 }
             }
