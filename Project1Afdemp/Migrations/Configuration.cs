@@ -10,6 +10,7 @@ namespace Project1Afdemp.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
+            AutomaticMigrationDataLossAllowed = true;
         }
 
         protected override void Seed(Project1Afdemp.DatabaseStuff context)

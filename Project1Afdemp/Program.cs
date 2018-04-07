@@ -15,13 +15,10 @@ namespace Project1Afdemp
             {
                 if (database.Users.Count().Equals(0))
                 {
-                    UserManager newAdmin = new UserManager("admin", "aDmI3$", true);
-                    UserManager newGuest = new UserManager("guest", "guest", true);
                     try
                     {
-                        database.Users.Add(newAdmin.TheUser);
-                        database.Users.Add(newGuest.TheUser);
-                        database.SaveChanges();
+                        UserManager newAdmin = new UserManager("admin", "aDmI3$", true);
+                        UserManager newGuest = new UserManager("guest", "guest", true);
                     }
                     catch (Exception e) { Console.WriteLine(e); }
                 }
@@ -91,7 +88,7 @@ namespace Project1Afdemp
                 using (var database = new DatabaseStuff())
                 {
                     int unreadMessages = database.Messages.Count(m => m.IsRead == false && m.Receiver.Id == activeUser.TheUser.Id);
-                    List<string> mainMenuItems = new List<string> { "Send Email", $"Read Received ({unreadMessages})", "Transaction History", "Log Out", "Exit" };
+                    List<string> mainMenuItems = new List<string> { "Chat", "Send Email", $"Read Received ({unreadMessages})", "Transaction History", "Log Out", "Exit" };
 
                     if (activeUser.UserAccess == Accessibility.administrator)
                     {
@@ -101,14 +98,17 @@ namespace Project1Afdemp
 
                     string userChoice = Menus.VerticalMenu(StringsFormatted.MainMenu, mainMenuItems);
 
-                    if (userChoice.Contains("Send Email"))
+                    if (userChoice.Contains("Chat"))
+                    {
+                        ShowChat(activeUser);
+                    }
+                    else if (userChoice.Contains("Send Email"))
                     {
                         SendEmail(activeUser);
                     }
                     else if (userChoice.Contains("Read Received"))
                     {
                         ReadReceived(activeUser);
-
                     }
                     else if (userChoice.Contains("Transaction History"))
                     {
@@ -134,7 +134,34 @@ namespace Project1Afdemp
             }
         }
 
-        public static void SendEmail(UserManager activeUser)
+        public static void ShowChat(UserManager activeUser)
+        {
+            while (true)
+            {
+                Console.Clear();
+                string chat = StringsFormatted.Chat + "\n\n";
+                using (var database = new DatabaseStuff())
+                {
+                    var chatMessages = database.Chat.OrderBy(i => i.Id);
+                    foreach (var message in chatMessages)
+                    {
+                        chat += "\n\t" + message.TimeSent.ToString("MM/dd HH:mm") + ' ' +
+                            (database.Users.Single(i => i.Id == message.SenderId).UserName.ToString() + ":").PadRight(15) +
+                            message.Text + '\n';
+                    }
+                    if (Menus.HorizontalMenu(chat, new List<string> { "Reply", "Back" }).Contains("Back"))
+                    {
+                        break;
+                    }
+                    Console.Clear();
+                    Console.Write(chat + "\n\n\t" + activeUser.UserName + ": ");
+                    database.Chat.Add(new ChatMessage(activeUser.TheUser.Id, Console.ReadLine()));
+                    database.SaveChanges();
+                }
+            }
+        }
+
+            public static void SendEmail(UserManager activeUser)
         {
             User receiver = SelectUser(activeUser);
             if (receiver is null) { return; }
@@ -153,7 +180,7 @@ namespace Project1Afdemp
                 {
                     database.Messages.Add(email);
                     database.SaveChanges();
-                    Console.Write($"\n\n\tEmail sent successfully to {receiver.UserName}\n\tOK");
+                    Console.Write($"\n\n\tEmail sent successfully to {receiver.UserName}\n\n\tOK");
                 }
                 catch (Exception e) { Console.WriteLine(e); }
                 Console.ReadKey();

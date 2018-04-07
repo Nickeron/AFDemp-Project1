@@ -39,24 +39,19 @@ namespace Project1Afdemp
                 Password = PasswordHandling.PasswordToHash(PasswordHandling.ConvertToSecureString(password), UserName);
             }
             SetAccessibility(isNewUser);
-            // If is new user create a user, else get the user from database
+            // If is new user create a user to database
             if (isNewUser)
             {
-                TheUser = new User(UserName, Password, UserAccess);
                 try
                 {
-                    UserDatabase.Users.Add(TheUser);
+                    UserDatabase.Users.Add(new User(UserName, Password, UserAccess));
                     UserDatabase.SaveChanges();
                 }catch(Exception e)
                 {
-                    Console.WriteLine(e.Message+" User could not get created");
+                    Console.WriteLine(e.Message + " User could not get created");
                 }
             }
-            else
-            {
-                TheUser = UserDatabase.Users.Single(u => u.UserName == UserName);
-            }
-            
+            TheUser = UserDatabase.Users.Single(u => u.UserName == UserName); 
         }
 
         public UserManager(bool isNewUser = false) : this("", "", isNewUser) { }
@@ -85,9 +80,9 @@ namespace Project1Afdemp
         {
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Red;
-            if (userName.Length < 5 || userName.Length > 20)
+            if (userName.Length < 5 || userName.Length > 14)
             {
-                Console.Write("\n\n\tUser Name has to be between 5 and 20 characters long!");
+                Console.Write("\n\n\tUser Name has to be between 5 and 14 characters long!");
                 Console.ResetColor();
                 return true;
             }

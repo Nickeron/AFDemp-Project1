@@ -54,20 +54,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Accessibility.cs" />
+    <Compile Include="ChatMessage.cs" />
     <Compile Include="DatabaseStuff.cs" />
     <Compile Include="Menus.cs" />
     <Compile Include="Message.cs" />
-    <Compile Include="Migrations\201803292021076_createUser.cs" />
-    <Compile Include="Migrations\201803292021076_createUser.Designer.cs">
-      <DependentUpon>201803292021076_createUser.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201803300529110_forkeys.cs" />
-    <Compile Include="Migrations\201803300529110_forkeys.Designer.cs">
-      <DependentUpon>201803300529110_forkeys.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201803311014105_readmessages.cs" />
-    <Compile Include="Migrations\201803311014105_readmessages.Designer.cs">
-      <DependentUpon>201803311014105_readmessages.cs</DependentUpon>
+    <Compile Include="Migrations\201804071607044_FirstMigration.cs" />
+    <Compile Include="Migrations\201804071607044_FirstMigration.Designer.cs">
+      <DependentUpon>201804071607044_FirstMigration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="PasswordHandling.cs" />
@@ -87,14 +80,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201803292021076_createUser.resx">
-      <DependentUpon>201803292021076_createUser.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201803300529110_forkeys.resx">
-      <DependentUpon>201803300529110_forkeys.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201803311014105_readmessages.resx">
-      <DependentUpon>201803311014105_readmessages.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201804071607044_FirstMigration.resx">
+      <DependentUpon>201804071607044_FirstMigration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

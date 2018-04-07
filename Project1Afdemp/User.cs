@@ -15,6 +15,8 @@ namespace Project1Afdemp
         // Virtual in this context means nullable
         public virtual ICollection<Message> ReceivedMessages { get; set; }
         public virtual ICollection<Message> SentMessages { get; set; }
+        public virtual ICollection<ChatMessage> SentChatMessages { get; set; }
+        public virtual ICollection<ChatMessage> UnreadChatMessages { get; set; }
 
         public User(string username, string password, Accessibility userAccess)
         {

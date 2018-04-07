@@ -6,6 +6,7 @@ namespace Project1Afdemp
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<ChatMessage> Chat { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -22,6 +23,18 @@ namespace Project1Afdemp
                         .HasRequired(m => m.Receiver)
                         .WithMany(t => t.ReceivedMessages)
                         .HasForeignKey(m => m.ReceiverId)
+                        .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<ChatMessage>()
+                        .HasRequired(m => m.Sender)
+                        .WithMany(t => t.SentChatMessages)
+                        .HasForeignKey(m => m.SenderId)
+                        .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<ChatMessage>()
+                        .HasRequired(m => m.Sender)
+                        .WithMany(t => t.UnreadChatMessages)
+                        .HasForeignKey(m => m.SenderId)
                         .WillCascadeOnDelete(false);
         }
     }
