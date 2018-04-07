@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Project1Afdemp
 {
@@ -36,29 +37,57 @@ namespace Project1Afdemp
 
         public static UserManager LoginScreen()
         {
+            bool successfullLogin = false;
             UserManager activeUser;
-            List<string> signOrLogItems = new List<string>{ "Sign Up", "Log In" };
-            string userChoice = Menus.HorizontalMenu(StringsFormatted.Welcome, signOrLogItems);
-            using (var database = new DatabaseStuff())
+            while (!successfullLogin)
             {
-                if (userChoice == "Log In")
+                List<string> signOrLogItems = new List<string> { "Sign Up", "Log In" };
+                string userChoice = Menus.HorizontalMenu(StringsFormatted.Welcome, signOrLogItems);
+                using (var database = new DatabaseStuff())
                 {
-                    activeUser = new UserManager();
-                }
-                else
-                {
-                    activeUser = new UserManager(true);
-                    try
+                    if (userChoice == "Log In")
                     {
-                        database.Users.Add(activeUser.TheUser);
-                        database.SaveChanges();
+                        try
+                        {
+                            activeUser = new UserManager();
+                            Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUser.UserAccess} {activeUser.UserName}");
+                            successfullLogin = true;
+                            Thread.Sleep(1200);
+                            return activeUser;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.Clear();
+                            Console.BackgroundColor = ConsoleColor.Red;
+                            Console.WriteLine(e.Message);
+                            Thread.Sleep(1200);
+                            Console.ResetColor();
+                        }
                     }
-                    catch (Exception e) { Console.WriteLine(e); }
+                    else
+                    {
+                        try
+                        {
+                            activeUser = new UserManager(true);
+                            database.Users.Add(activeUser.TheUser);
+                            database.SaveChanges();
+                            Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUser.UserAccess} {activeUser.UserName}");
+                            successfullLogin = true;
+                            Thread.Sleep(1200);
+                            return activeUser;
+                        }
+                        catch (Exception e)
+                        {
+                            Console.Clear();
+                            Console.BackgroundColor = ConsoleColor.Red;
+                            Console.WriteLine(e.Message);
+                            Thread.Sleep(1200);
+                            Console.ResetColor();
+                        }
+                    }
                 }
             }
-            Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUser.UserAccess} {activeUser.UserName}");
-            Console.ReadKey();
-            return activeUser;
+            return null;
         }
 
         public static void MainMenu(UserManager activeUser)

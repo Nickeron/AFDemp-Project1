@@ -11,6 +11,7 @@ namespace Project1Afdemp
         public string Password { get; private set; }
         public Accessibility UserAccess { get; private set; }
         private static DatabaseStuff UserDatabase { get; set; }
+        private int LoginTries { get; set; }
 
         #region Constructors
         static UserManager()
@@ -20,6 +21,7 @@ namespace Project1Afdemp
 
         public UserManager(string userName, string password, bool isNewUser = false)
         {
+            LoginTries = 1;
             if (IsWrongUserName(userName, isNewUser))
             {
                 AskUserName(isNewUser);
@@ -28,6 +30,7 @@ namespace Project1Afdemp
             {
                 UserName = userName;
             }
+            LoginTries = 1;
             if (IsWrongPassword(PasswordHandling.ConvertToSecureString(password), isNewUser))
             {
                 AskPassword(isNewUser);
@@ -50,10 +53,15 @@ namespace Project1Afdemp
             Console.Clear();
             Console.Write("\n\n\tUser Name:\t");
             string userName = Console.ReadLine();
-            while (IsWrongUserName(userName, isNewUser))
+            while (IsWrongUserName(userName, isNewUser) && LoginTries < 3)
             {
                 Console.Write("\n\n\tUser Name:\t");
                 userName = Console.ReadLine();
+                LoginTries++;   
+            }
+            if (LoginTries == 3 && IsWrongUserName(userName, isNewUser))
+            {
+                throw new ArgumentException("\n\n\tToo many false attempts");
             }
             UserName = userName;
         }
@@ -96,10 +104,15 @@ namespace Project1Afdemp
             Console.Clear();
             Console.Write("\n\n\tPassword:\t");
             var password = PasswordHandling.GetPassword();
-            while (IsWrongPassword(password, isNewUser))
+            while (IsWrongPassword(password, isNewUser) && LoginTries < 3)
             {
                 Console.Write("\n\n\tPassword:\t");
                 password = PasswordHandling.GetPassword();
+                LoginTries++;
+            }
+            if (LoginTries == 3 && IsWrongPassword(password, isNewUser))
+            {
+                throw new ArgumentException("\n\n\tToo many false attempts");
             }
             Password = PasswordHandling.PasswordToHash(password, UserName);
         }
