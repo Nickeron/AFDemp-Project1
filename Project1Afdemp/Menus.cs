@@ -21,7 +21,7 @@ namespace Project1Afdemp
                     if (currentItem == item)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine($"\n\t|{menuItems[item]}|".PadRight(10));
+                        Console.WriteLine($"\n\t{menuItems[item]}".PadRight(10));
                     }
                     else
                     {
@@ -66,7 +66,7 @@ namespace Project1Afdemp
                     if (currentItem == item)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.Write($"\t|{menuItems[item]}|".PadRight(10));
+                        Console.Write($"\t{menuItems[item]}".PadRight(10));
                     }
                     else
                     {

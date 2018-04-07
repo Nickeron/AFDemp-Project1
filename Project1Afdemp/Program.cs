@@ -14,8 +14,8 @@ namespace Project1Afdemp
             {
                 if (database.Users.Count().Equals(0))
                 {
-                    UserManager newAdmin = new UserManager("admin", PasswordHandling.ConvertToSecureString("aDmI3$"), true);
-                    UserManager newGuest = new UserManager("guest", PasswordHandling.ConvertToSecureString("guest"), true);
+                    UserManager newAdmin = new UserManager("admin", "aDmI3$", true);
+                    UserManager newGuest = new UserManager("guest", "guest", true);
                     try
                     {
                         database.Users.Add(newAdmin.TheUser);

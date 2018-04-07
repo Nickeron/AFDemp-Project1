@@ -18,7 +18,7 @@ namespace Project1Afdemp
             UserDatabase = new DatabaseStuff();
         }
 
-        public UserManager(string userName, SecureString password, bool isNewUser = false)
+        public UserManager(string userName, string password, bool isNewUser = false)
         {
             if (IsWrongUserName(userName, isNewUser))
             {
@@ -28,20 +28,20 @@ namespace Project1Afdemp
             {
                 UserName = userName;
             }
-            if (UserName != "guest" || IsWrongPassword(password, isNewUser))
+            if (IsWrongPassword(PasswordHandling.ConvertToSecureString(password), isNewUser))
             {
                 AskPassword(isNewUser);
             }
             else
             {
-                Password = PasswordHandling.PasswordToHash(password, UserName);
+                Password = PasswordHandling.PasswordToHash(PasswordHandling.ConvertToSecureString(password), UserName);
             }
             SetAccessibility(isNewUser);
             // If is new user create a user, else get the user from database
             TheUser = (isNewUser)?new User(UserName, Password, UserAccess): UserDatabase.Users.Single(u => u.UserName == UserName);
         }
 
-        public UserManager(bool isNewUser = false) : this("", new SecureString(), isNewUser) { }
+        public UserManager(bool isNewUser = false) : this("", "", isNewUser) { }
         #endregion
 
         #region UserName Methods
