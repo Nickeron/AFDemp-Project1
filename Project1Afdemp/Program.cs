@@ -37,9 +37,8 @@ namespace Project1Afdemp
 
         public static UserManager LoginScreen()
         {
-            bool successfullLogin = false;
             UserManager activeUser;
-            while (!successfullLogin)
+            while (true)
             {
                 List<string> signOrLogItems = new List<string> { "Sign Up", "Log In" };
                 string userChoice = Menus.HorizontalMenu(StringsFormatted.Welcome, signOrLogItems);
@@ -51,7 +50,6 @@ namespace Project1Afdemp
                         {
                             activeUser = new UserManager();
                             Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUser.UserAccess} {activeUser.UserName}");
-                            successfullLogin = true;
                             Thread.Sleep(1200);
                             return activeUser;
                         }
@@ -72,7 +70,6 @@ namespace Project1Afdemp
                             database.Users.Add(activeUser.TheUser);
                             database.SaveChanges();
                             Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUser.UserAccess} {activeUser.UserName}");
-                            successfullLogin = true;
                             Thread.Sleep(1200);
                             return activeUser;
                         }
@@ -87,7 +84,6 @@ namespace Project1Afdemp
                     }
                 }
             }
-            return null;
         }
 
         public static void MainMenu(UserManager activeUser)
