@@ -29,8 +29,12 @@ namespace Project1Afdemp
                     }
                     Console.ResetColor();
                 }
-                keyInfo = Console.ReadKey(true);
-               
+                do
+                {
+                    keyInfo = Console.ReadKey(true);
+                } while (keyInfo.KeyChar != 13 && keyInfo.Key.ToString() != "DownArrow" && keyInfo.Key.ToString() != "UpArrow");
+
+
                 if (keyInfo.Key.ToString() == "DownArrow")
                 {
                     currentItem++;
@@ -70,7 +74,10 @@ namespace Project1Afdemp
                     }
                     Console.ResetColor();
                 }
-                keyInfo = Console.ReadKey(true);
+                do
+                {
+                    keyInfo = Console.ReadKey(true);
+                } while (keyInfo.KeyChar != 13 && keyInfo.Key.ToString() != "RightArrow" && keyInfo.Key.ToString() != "LeftArrow");
 
                 if (keyInfo.Key.ToString() == "RightArrow")
                 {

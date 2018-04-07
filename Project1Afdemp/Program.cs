@@ -6,8 +6,26 @@ namespace Project1Afdemp
 {
     class Program
     {
+
         static void Main(string[] args)
         {
+            // If database is empty create the 2 basic users beforehand.
+            using (var database = new DatabaseStuff())
+            {
+                if (database.Users.Count().Equals(0))
+                {
+                    UserManager newAdmin = new UserManager("admin", PasswordHandling.ConvertToSecureString("aDmI3$"), true);
+                    UserManager newGuest = new UserManager("guest", PasswordHandling.ConvertToSecureString("guest"), true);
+                    try
+                    {
+                        database.Users.Add(newAdmin.TheUser);
+                        database.Users.Add(newGuest.TheUser);
+                        database.SaveChanges();
+                    }
+                    catch (Exception e) { Console.WriteLine(e); }
+                }
+            }
+
             UserManager activeUser;
             while (true)
             {
@@ -257,7 +275,7 @@ namespace Project1Afdemp
 
         public static void DeleteUser(User delUser)
         {
-            if (Menus.HorizontalMenu("Are you sure you want to delete this user?", new List<string>{ "Yes","No"}).Contains('Y'))
+            if (Menus.HorizontalMenu("\n\n\tAre you sure you want to delete this user?", new List<string>{ "Yes","No"}).Contains('Y'))
             {
                 using (var database = new DatabaseStuff())
                 {
@@ -309,7 +327,7 @@ namespace Project1Afdemp
                 }
                 database.SaveChanges();
             }
-            Console.Write($"\n\n\tYou did {change}, the user: {chUser.UserName}\n\n\t\tOK");
+            Console.Write($"\n\n\tYou did {change}, the user: {chUser.UserName}\n\n\tOK");
             Console.ReadKey();
         }
     }
