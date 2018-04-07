@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -88,7 +89,8 @@ namespace Project1Afdemp
                 using (var database = new DatabaseStuff())
                 {
                     int unreadMessages = database.Messages.Count(m => m.IsRead == false && m.Receiver.Id == activeUser.TheUser.Id);
-                    int unreadChat = activeUser.TheUser.IdsUnreadChatMessages.Split(' ').Length-1;
+                    int unreadChat = database.Users.Single(c=> c.UserName==activeUser.UserName).IdsUnreadChatMessages.Split(' ').Length-1;
+                    Debug.WriteLine(activeUser.TheUser.IdsUnreadChatMessages);
 
                     List<string> mainMenuItems = new List<string> { $"Chat ({unreadChat})", "Send Email", $"Read Received ({unreadMessages})", "Transaction History", "Log Out", "Exit" };
 
