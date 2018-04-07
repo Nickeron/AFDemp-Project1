@@ -40,7 +40,23 @@ namespace Project1Afdemp
             }
             SetAccessibility(isNewUser);
             // If is new user create a user, else get the user from database
-            TheUser = (isNewUser)?new User(UserName, Password, UserAccess): UserDatabase.Users.Single(u => u.UserName == UserName);
+            if (isNewUser)
+            {
+                TheUser = new User(UserName, Password, UserAccess);
+                try
+                {
+                    UserDatabase.Users.Add(TheUser);
+                    UserDatabase.SaveChanges();
+                }catch(Exception e)
+                {
+                    Console.WriteLine(e.Message+" User could not get created");
+                }
+            }
+            else
+            {
+                TheUser = UserDatabase.Users.Single(u => u.UserName == UserName);
+            }
+            
         }
 
         public UserManager(bool isNewUser = false) : this("", "", isNewUser) { }

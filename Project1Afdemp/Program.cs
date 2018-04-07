@@ -67,8 +67,6 @@ namespace Project1Afdemp
                         try
                         {
                             activeUser = new UserManager(true);
-                            database.Users.Add(activeUser.TheUser);
-                            database.SaveChanges();
                             Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUser.UserAccess} {activeUser.UserName}");
                             Thread.Sleep(1200);
                             return activeUser;
@@ -222,12 +220,6 @@ namespace Project1Afdemp
             using (var database = new DatabaseStuff())
             {
                 UserManager newUser = new UserManager(true);
-                try
-                {
-                    database.Users.Add(newUser.TheUser);
-                    database.SaveChanges();
-                }
-                catch (Exception e) { Console.WriteLine(e); }
             }
         }
 
