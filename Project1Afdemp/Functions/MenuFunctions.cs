@@ -71,7 +71,7 @@ namespace Project1Afdemp
                         {
                             chat += "\n\t__________________________NEW__________________________\n";
                         }
-                        chat += "\n\t" + message.TimeSent.ToString("MM/dd HH:mm") + ' ' +
+                        chat += "\n\t" + message.TimeSent.ToString("MM/dd HH:mm") + "   " +
                             (database.Users.Single(i => i.Id == message.SenderId).UserName.ToString() + ":").PadRight(15) +
                             message.Text + '\n';
                     }

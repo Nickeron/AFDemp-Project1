@@ -57,11 +57,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Accessibility.cs" />
-    <Compile Include="ChatMessage.cs" />
+    <Compile Include="Objects\ChatMessage.cs" />
     <Compile Include="DatabaseStuff.cs" />
-    <Compile Include="MenuFunctions.cs" />
-    <Compile Include="Menus.cs" />
-    <Compile Include="Message.cs" />
+    <Compile Include="Functions\MenuFunctions.cs" />
+    <Compile Include="Functions\Menus.cs" />
+    <Compile Include="Objects\Message.cs" />
     <Compile Include="Migrations\201804071607044_FirstMigration.cs" />
     <Compile Include="Migrations\201804071607044_FirstMigration.Designer.cs">
       <DependentUpon>201804071607044_FirstMigration.cs</DependentUpon>
@@ -71,14 +71,14 @@
       <DependentUpon>201804071835078_UnreadMessages.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="PasswordHandling.cs" />
+    <Compile Include="Functions\PasswordHandling.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReadAndParse.cs" />
-    <Compile Include="SideFunctions.cs" />
+    <Compile Include="Functions\ReadAndParse.cs" />
+    <Compile Include="Functions\SideFunctions.cs" />
     <Compile Include="StringsFormatted.cs" />
-    <Compile Include="User.cs" />
-    <Compile Include="UserManager.cs" />
+    <Compile Include="Objects\User.cs" />
+    <Compile Include="Objects\UserManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
