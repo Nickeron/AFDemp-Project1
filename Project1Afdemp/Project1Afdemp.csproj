@@ -59,6 +59,7 @@
     <Compile Include="Accessibility.cs" />
     <Compile Include="ChatMessage.cs" />
     <Compile Include="DatabaseStuff.cs" />
+    <Compile Include="MenuFunctions.cs" />
     <Compile Include="Menus.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Migrations\201804071607044_FirstMigration.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReadAndParse.cs" />
+    <Compile Include="SideFunctions.cs" />
     <Compile Include="StringsFormatted.cs" />
     <Compile Include="User.cs" />
     <Compile Include="UserManager.cs" />
