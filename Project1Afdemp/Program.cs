@@ -24,18 +24,18 @@ namespace Project1Afdemp
                     catch (Exception e) { Console.WriteLine(e); }
                 }
             }
-
-            UserManager activeUser;
+            // 
+            UserManager activeUserManager;
             while (true)
             {
-                activeUser = LoginScreen();
-                MainMenu(activeUser);
+                activeUserManager = LoginScreen();
+                MainMenu(activeUserManager);
             }
         }
 
         public static UserManager LoginScreen()
         {
-            UserManager activeUser;
+            UserManager activeUserManager;
             while (true)
             {
                 List<string> signOrLogItems = new List<string> { "Sign Up", "Log In" };
@@ -46,10 +46,10 @@ namespace Project1Afdemp
                     {
                         try
                         {
-                            activeUser = new UserManager();
-                            Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUser.UserAccess} {activeUser.UserName}");
+                            activeUserManager = new UserManager();
+                            Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUserManager.UserAccess} {activeUserManager.UserName}");
                             Thread.Sleep(1200);
-                            return activeUser;
+                            return activeUserManager;
                         }
                         catch (Exception e)
                         {
@@ -64,10 +64,10 @@ namespace Project1Afdemp
                     {
                         try
                         {
-                            activeUser = new UserManager(true);
-                            Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUser.UserAccess} {activeUser.UserName}");
+                            activeUserManager = new UserManager(true);
+                            Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUserManager.UserAccess} {activeUserManager.UserName}");
                             Thread.Sleep(1200);
-                            return activeUser;
+                            return activeUserManager;
                         }
                         catch (Exception e)
                         {
@@ -82,19 +82,18 @@ namespace Project1Afdemp
             }
         }
 
-        public static void MainMenu(UserManager activeUser)
+        public static void MainMenu(UserManager activeUserManager)
         {
             while (true)
             {
                 using (var database = new DatabaseStuff())
                 {
-                    int unreadMessages = database.Messages.Count(m => m.IsRead == false && m.Receiver.Id == activeUser.TheUser.Id);
-                    int unreadChat = database.Users.Single(c=> c.UserName==activeUser.UserName).IdsUnreadChatMessages.Split(' ').Length-1;
-                    Debug.WriteLine(activeUser.TheUser.IdsUnreadChatMessages);
+                    int unreadMessages = database.Messages.Count(m => m.IsRead == false && m.Receiver.Id == activeUserManager.TheUser.Id);
+                    int unreadChat = database.Users.Single(c=> c.UserName==activeUserManager.UserName).IdsUnreadChatMessages.Split(' ').Length-1;
 
                     List<string> mainMenuItems = new List<string> { $"Chat ({unreadChat})", "Send Email", $"Read Received ({unreadMessages})", "Transaction History", "Log Out", "Exit" };
 
-                    if (activeUser.UserAccess == Accessibility.administrator)
+                    if (activeUserManager.UserAccess == Accessibility.administrator)
                     {
                         mainMenuItems.Insert(3, "Manage Users");
                         mainMenuItems.Insert(4, "Create NEW User");
@@ -104,23 +103,23 @@ namespace Project1Afdemp
 
                     if (userChoice.Contains("Chat"))
                     {
-                        ShowChat(activeUser);
+                        ShowChat(activeUserManager);
                     }
                     else if (userChoice.Contains("Send Email"))
                     {
-                        SendEmail(activeUser);
+                        SendEmail(activeUserManager);
                     }
                     else if (userChoice.Contains("Read Received"))
                     {
-                        ReadReceived(activeUser);
+                        ReadReceived(activeUserManager);
                     }
                     else if (userChoice.Contains("Transaction History"))
                     {
-                        TransactionHistory(activeUser);
+                        TransactionHistory(activeUserManager);
                     }
                     else if (userChoice.Contains("Manage Users"))
                     {
-                        ManageUsers(activeUser);
+                        ManageUsers(activeUserManager);
                     }
                     else if (userChoice.Contains("Create NEW User"))
                     {
@@ -138,7 +137,7 @@ namespace Project1Afdemp
             }
         }
 
-        public static void ShowChat(UserManager activeUser)
+        public static void ShowChat(UserManager activeUserManager)
         {
             while (true)
             {
@@ -149,26 +148,27 @@ namespace Project1Afdemp
                     var chatMessages = database.Chat.OrderBy(i => i.Id);
                     foreach (var message in chatMessages)
                     {
-                        if (message.Id.ToString().Equals(activeUser.TheUser.IdsUnreadChatMessages.FirstOrDefault()))
+                        if (message.Id.ToString().Equals(database.Users.Single(c => c.UserName == activeUserManager.UserName).IdsUnreadChatMessages.Split(' ').FirstOrDefault()))
                         {
-                            chat += "\n__________________________NEW__________________________";
+                            chat += "\n\t__________________________NEW__________________________\n";
                         }
+                        Debug.WriteLine(database.Users.Single(c => c.UserName == activeUserManager.UserName).IdsUnreadChatMessages.Split(' ').FirstOrDefault());
                         chat += "\n\t" + message.TimeSent.ToString("MM/dd HH:mm") + ' ' +
                             (database.Users.Single(i => i.Id == message.SenderId).UserName.ToString() + ":").PadRight(15) +
                             message.Text + '\n';
                     }
-                    activeUser.ClearUnreadChat();
+                    activeUserManager.ClearUnreadChat();
                     if (Menus.HorizontalMenu(chat, new List<string> { "Reply", "Back" }).Contains("Back"))
                     {
                         break;
                     }
                     Console.Clear();
-                    Console.Write(chat + "\n\n\t" + activeUser.UserName + ": ");
-                    ChatMessage newReply = new ChatMessage(activeUser.TheUser.Id, Console.ReadLine());
+                    Console.Write(chat + "\n\n\t" + activeUserManager.UserName + ": ");
+                    ChatMessage newReply = new ChatMessage(activeUserManager.TheUser.Id, Console.ReadLine());
                     database.Chat.Add(newReply);
                     database.SaveChanges();
                     ChatMessage freshReply = database.Chat.OrderByDescending(t => t.TimeSent).First();
-                    var unReadUsers = database.Users.Where(u => u.UserName != activeUser.UserName);
+                    var unReadUsers = database.Users.Where(u => u.UserName != activeUserManager.UserName);
                     foreach (User unreadUser in unReadUsers)
                     {
                         unreadUser.IdsUnreadChatMessages += freshReply.Id.ToString()+' ';
@@ -178,9 +178,9 @@ namespace Project1Afdemp
             }
         }
 
-            public static void SendEmail(UserManager activeUser)
+            public static void SendEmail(UserManager activeUserManager)
         {
-            User receiver = SelectUser(activeUser);
+            User receiver = SelectUser(activeUserManager);
             if (receiver is null) { return; }
             Console.WriteLine(StringsFormatted.SendEmail);
             Console.Write("\n\n\tTitle: ");
@@ -191,7 +191,7 @@ namespace Project1Afdemp
 
             using (var database = new DatabaseStuff())
             {
-                int senderId = database.Users.Single(i => i.UserName == activeUser.UserName).Id;
+                int senderId = database.Users.Single(i => i.UserName == activeUserManager.UserName).Id;
                 Message email = new Message(senderId, receiver.Id, MessageTitle, MessageBody);
                 try
                 {
@@ -204,9 +204,9 @@ namespace Project1Afdemp
             }
         }
 
-        public static void ReadReceived(UserManager activeUser)
+        public static void ReadReceived(UserManager activeUserManager)
         {
-            Message receivedMessage = SelectMessage(activeUser);
+            Message receivedMessage = SelectMessage(activeUserManager);
             if (receivedMessage is null) { return; }
             Console.Write($"\n\n\tTitle: {receivedMessage.Title}\n\n\tBody: {receivedMessage.Body}\n\n\tOK");
             using (var database = new DatabaseStuff())
@@ -218,14 +218,14 @@ namespace Project1Afdemp
             Console.ReadKey();
         }
 
-        public static void TransactionHistory(UserManager activeUser)
+        public static void TransactionHistory(UserManager activeUserManager)
         {
             Console.Clear();
             Console.WriteLine(StringsFormatted.History+'\n');
             using (var database = new DatabaseStuff())
             {
                 List<Message> messages = database.Messages.ToList();
-                int receiverId = database.Users.Single(i => i.UserName == activeUser.UserName).Id;
+                int receiverId = database.Users.Single(i => i.UserName == activeUserManager.UserName).Id;
                 string senderName;
                 string receiverName;
                 try
@@ -243,17 +243,17 @@ namespace Project1Afdemp
             }
         }
 
-        public static void ManageUsers(UserManager activeUser)
+        public static void ManageUsers(UserManager activeUserManager)
         {
-            User receiver = SelectUser(activeUser);
+            User receiver = SelectUser(activeUserManager);
             if (receiver is null) { return; }
-            List<string> ChangeUserItems = new List<string> { "Permissions", "Delete User", "Back" };
-            string choice = Menus.VerticalMenu(StringsFormatted.ManageUsers, ChangeUserItems);
-            if(choice == "Delete User")
+            List<string> ChangeUserMenuItems = new List<string> { "Permissions", "Delete User", "Back" };
+            string manageUsersChoice = Menus.VerticalMenu(StringsFormatted.ManageUsers, ChangeUserMenuItems);
+            if(manageUsersChoice == "Delete User")
             {
                 DeleteUser(receiver);
             }
-            else if (choice == "Permissions")
+            else if (manageUsersChoice == "Permissions")
             {
                 ChangeUserPermissions(receiver);
             }
@@ -267,18 +267,18 @@ namespace Project1Afdemp
             }
         }
 
-        public static User SelectUser(UserManager activeUser)
+        public static User SelectUser(UserManager activeUserManager)
         {
             List<string> selectUserItems = new List<string>();
             using (var database = new DatabaseStuff())
             {
-                List<User> users = database.Users.ToList();
+                List<User> availableUsers = database.Users.ToList();
 
                 try
                 {
-                    foreach (User user in users)
+                    foreach (User user in availableUsers)
                     {
-                        if (user.UserName != activeUser.UserName)
+                        if (user.UserName != activeUserManager.UserName)
                         {
                             selectUserItems.Add(user.UserName);
                         }                        
@@ -291,20 +291,20 @@ namespace Project1Afdemp
                     Console.ReadKey();
                     return null;
                 }
-                string sUser = Menus.VerticalMenu(StringsFormatted.SelectUser, selectUserItems);
+                string selectedUserName = Menus.VerticalMenu(StringsFormatted.SelectUser, selectUserItems);
 
                 Console.Clear();
-                return database.Users.Single(i => i.UserName == sUser);
+                return database.Users.Single(i => i.UserName == selectedUserName);
             }
         }
 
-        public static Message SelectMessage(UserManager activeUser)
+        public static Message SelectMessage(UserManager activeUserManager)
         {
             List<string> selectMessageItems = new List<string>();
             using (var database = new DatabaseStuff())
             {
                 List<Message> messages = database.Messages.ToList();
-                int receiverId = database.Users.Single(i => i.UserName == activeUser.UserName).Id;
+                int receiverId = database.Users.Single(i => i.UserName == activeUserManager.UserName).Id;
                 string senderName;
                 try
                 {
@@ -344,31 +344,31 @@ namespace Project1Afdemp
             }
         }
 
-        public static void DeleteUser(User delUser)
+        public static void DeleteUser(User deletingUser)
         {
             if (Menus.HorizontalMenu("\n\n\tAre you sure you want to delete this user?", new List<string>{ "Yes","No"}).Contains('Y'))
             {
                 using (var database = new DatabaseStuff())
                 {
-                    database.Users.Remove(database.Users.Single(i => i.UserName == delUser.UserName));
-                    var query = database.Messages.Where(i => i.ReceiverId == delUser.Id || i.SenderId == delUser.Id);
-                    foreach(var item in query)
+                    database.Users.Remove(database.Users.Single(i => i.UserName == deletingUser.UserName));
+                    var deletingMessages = database.Messages.Where(i => i.ReceiverId == deletingUser.Id || i.SenderId == deletingUser.Id);
+                    foreach(Message deletingMessage in deletingMessages)
                     {
-                        database.Messages.Remove(item);
+                        database.Messages.Remove(deletingMessage);
                     }
                     database.SaveChanges();                       
                 }
             }
         }
 
-        public static void ChangeUserPermissions(User chUser)
+        public static void ChangeUserPermissions(User changingUser)
         {
             List<string> manageUserItems;
-            if (chUser.UserAccess == Accessibility.administrator)
+            if (changingUser.UserAccess == Accessibility.administrator)
             {
                 manageUserItems = new List<string>() { "downgrade to USER", "downgrade to GUEST" ,"Back"};
             }
-            else if(chUser.UserAccess == Accessibility.user)
+            else if(changingUser.UserAccess == Accessibility.user)
             {
                 manageUserItems = new List<string>() { "upgrade to ADMINISTRATOR", "downgrade to GUEST", "Back" };
             }
@@ -376,21 +376,21 @@ namespace Project1Afdemp
             {
                 manageUserItems = new List<string>() { "upgrade to ADMINISTRATOR", "upgrade to USER", "Back" };
             }
-            string change = Menus.VerticalMenu($"\n\n\t{chUser.UserName} is {chUser.UserAccess}, how do you want to change his permissions?", manageUserItems);
+            string changeOfAccess = Menus.VerticalMenu($"\n\n\t{changingUser.UserName} is {changingUser.UserAccess}, how do you want to change his permissions?", manageUserItems);
             using (var database = new DatabaseStuff())
             {
-                User toChange = database.Users.Single(i => i.UserName == chUser.UserName);
-                if (change.Contains("ADMINISTRATOR"))
+                User changedUser = database.Users.Single(i => i.UserName == changingUser.UserName);
+                if (changeOfAccess.Contains("ADMINISTRATOR"))
                 {
-                    toChange.UserAccess = Accessibility.administrator;
+                    changedUser.UserAccess = Accessibility.administrator;
                 }
-                else if (change.Contains("USER"))
+                else if (changeOfAccess.Contains("USER"))
                 {
-                    toChange.UserAccess = Accessibility.user;
+                    changedUser.UserAccess = Accessibility.user;
                 }
-                else if (change.Contains("GUEST"))
+                else if (changeOfAccess.Contains("GUEST"))
                 {
-                    toChange.UserAccess = Accessibility.guest;
+                    changedUser.UserAccess = Accessibility.guest;
                 }
                 else
                 {
@@ -398,7 +398,7 @@ namespace Project1Afdemp
                 }
                 database.SaveChanges();
             }
-            Console.Write($"\n\n\tYou did {change}, the user: {chUser.UserName}\n\n\tOK");
+            Console.Write($"\n\n\tYou did {changeOfAccess}, the user: {changingUser.UserName}\n\n\tOK");
             Console.ReadKey();
         }
     }
