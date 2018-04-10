@@ -92,16 +92,40 @@ namespace Project1Afdemp
             }
         }
 
-        public static void ReadReceivedMessage(Message receivedMessage)
+        public static void ReadReceivedMessage(UserManager activeUserManager, Message receivedMessage)
         {
-            Console.Clear();
-            Console.Write($"\n\n\tTitle: {receivedMessage.Title}\n\n\tBody: {receivedMessage.Body}\n\n\tOK");
+            List<string> forwardReplyItems = new List<string> { "Forward", "Reply", "Back" };
+            string presentedMessage = StringsFormatted.ReadEmails +$"\n\n\tTitle: {receivedMessage.Title}\n\n\tBody: {receivedMessage.Body}";
+            string readMessageReaction = Menus.HorizontalMenu(presentedMessage, forwardReplyItems);
             using (var database = new DatabaseStuff())
             {
                 Message readMessage = database.Messages.Single(m => m.Id == receivedMessage.Id);
                 readMessage.IsRead = true;
                 database.SaveChanges();
+                if (readMessageReaction.Contains("Forward"))
+                {
+                    ForwardMessage(activeUserManager, receivedMessage);
+                }
+                else if (readMessageReaction.Contains("Reply"))
+                {
+                    MenuFunctions.SendEmail(activeUserManager, database.Users.Single(u=> u.Id == readMessage.Sender.Id));
+                }
+            } 
+        }
+
+        public static void ForwardMessage(UserManager activeUserManager, Message forwardMessage)
+        {
+            User receiver = SelectUser(activeUserManager);
+            string forwardTitle = "FW:" + forwardMessage.Title;
+            string forwardBody = forwardMessage.Body;
+            Message forwardedMessage = new Message(activeUserManager.TheUser.Id, receiver.Id, forwardTitle, forwardBody);
+            using (var database = new DatabaseStuff())
+            {
+                database.Messages.Add(forwardedMessage);
+                database.SaveChanges();
             }
+            Console.Clear();
+            Console.WriteLine($"\n\n\tMessage successfully forwarded to {receiver.UserName}\n\n\tOK");
             Console.ReadKey();
         }
 

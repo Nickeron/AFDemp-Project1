@@ -96,12 +96,21 @@ namespace Project1Afdemp
             }
         }
 
-        public static void SendEmail(UserManager activeUserManager)
+        public static void SendEmail(UserManager activeUserManager, User receiver = null)
         {
-            User receiver = SideFunctions.SelectUser(activeUserManager);
+            string title;
+            if(receiver is null)
+            {
+                title = "\n\n\tTitle: ";
+                receiver = SideFunctions.SelectUser(activeUserManager);
+            }
+            else
+            {
+                title = "\n\n\tTitle: RE>";
+            }
             if (receiver is null) { return; }
             Console.WriteLine(StringsFormatted.SendEmail);
-            Console.Write("\n\n\tTitle: ");
+            Console.Write(title);
             string MessageTitle = Console.ReadLine();
 
             Console.Write("\n\tBody: ");
@@ -133,7 +142,7 @@ namespace Project1Afdemp
                 userChoice = Menus.VerticalMenu(StringsFormatted.Options, messageOptions);
                 if (userChoice.Contains("Read"))
                 {
-                    SideFunctions.ReadReceivedMessage(receivedMessage);
+                    SideFunctions.ReadReceivedMessage(activeUserManager, receivedMessage);
                 }
                 else if (userChoice.Contains("Delete"))
                 {
