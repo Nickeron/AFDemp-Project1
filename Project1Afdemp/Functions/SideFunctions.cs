@@ -30,8 +30,12 @@ namespace Project1Afdemp
                     Console.ReadKey();
                     return null;
                 }
+                selectUserItems.Add("Back");
                 string selectedUserName = Menus.VerticalMenu(StringsFormatted.SelectUser, selectUserItems);
-
+                if (selectedUserName.Contains("Back"))
+                {
+                    return null;
+                }
                 Console.Clear();
                 return database.Users.Single(i => i.UserName == selectedUserName);
             }
@@ -74,12 +78,45 @@ namespace Project1Afdemp
                     Console.ReadKey();
                     return null;
                 }
+                selectMessageItems.Add("Back");
                 string oMessage = Menus.VerticalMenu(StringsFormatted.OpenMessage, selectMessageItems);
+                if (oMessage.Contains("Back"))
+                {
+                    return null;
+                }
                 string[] selParameters = oMessage.Split('|');
                 int messageID = int.Parse(selParameters[1]);
 
                 Console.Clear();
                 return database.Messages.Single(i => i.Id == messageID);
+            }
+        }
+
+        public static void ReadReceivedMessage(Message receivedMessage)
+        {
+            Console.Clear();
+            Console.Write($"\n\n\tTitle: {receivedMessage.Title}\n\n\tBody: {receivedMessage.Body}\n\n\tOK");
+            using (var database = new DatabaseStuff())
+            {
+                Message readMessage = database.Messages.Single(m => m.Id == receivedMessage.Id);
+                readMessage.IsRead = true;
+                database.SaveChanges();
+            }
+            Console.ReadKey();
+        }
+
+        public static void DeleteMessage(Message receivedMessage)
+        {
+            if (Menus.HorizontalMenu("\n\n\tAre you sure you want to delete this message?", new List<string> { "Yes", "No" }).Contains('Y'))
+            {
+                using (var database = new DatabaseStuff())
+                {
+                    database.Messages.Remove(database.Messages.Single(i => i.Id == receivedMessage.Id));
+                    database.SaveChanges();
+                    Console.Clear();
+                    Console.WriteLine("\n\n\tMessage successfully DELETED\n\n\tOK");
+                    Console.ReadKey();
+                }
             }
         }
 
@@ -97,14 +134,23 @@ namespace Project1Afdemp
             {
                 using (var database = new DatabaseStuff())
                 {
+                    // When deleting a user you have to erase their emails and chat messages as well
                     database.Users.Remove(database.Users.Single(i => i.UserName == deletingUser.UserName));
                     var deletingMessages = database.Messages.Where(i => i.ReceiverId == deletingUser.Id || i.SenderId == deletingUser.Id);
                     foreach (Message deletingMessage in deletingMessages)
                     {
                         database.Messages.Remove(deletingMessage);
                     }
+                    var deletingChatMessages = database.Chat.Where(i => i.SenderId == deletingUser.Id);
+                    foreach (ChatMessage deletingChatMessage in deletingChatMessages)
+                    {
+                        database.Chat.Remove(deletingChatMessage);
+                    }
                     database.SaveChanges();
                 }
+                Console.Clear();
+                Console.WriteLine("\n\n\tUser successfully DELETED\n\n\tOK");
+                Console.ReadKey();
             }
         }
 

@@ -23,6 +23,7 @@ namespace Project1Afdemp
             }
             // Create the main object for managing user's functions
             UserManager activeUserManager;
+
             while (true)
             {
                 // Everytime a user logs out the active user manager get's another object.
@@ -37,11 +38,14 @@ namespace Project1Afdemp
             {
                 using (var database = new DatabaseStuff())
                 {
+                    // Probe the database for the nuber of unread messages in chat and unread mail
                     int unreadMessages = database.Messages.Count(m => m.IsRead == false && m.Receiver.Id == activeUserManager.TheUser.Id);
                     int unreadChat = database.Users.Single(c=> c.UserName==activeUserManager.UserName).IdsUnreadChatMessages.Split(' ').Length-1;
 
-                    List<string> mainMenuItems = new List<string> { $"Chat ({unreadChat})", "Send Email", $"Read Received ({unreadMessages})", "Log Out", "Exit" };
+                    // Create the Menu items common to all users
+                    List<string> mainMenuItems = new List<string> { $"Chat ({unreadChat})", "Send Email", $"Inbox ({unreadMessages})", "Log Out", "Exit" };
 
+                    // Add more options for User and Administrator access.
                     if (activeUserManager.UserAccess == Accessibility.administrator || activeUserManager.UserAccess == Accessibility.user)
                     {
                         mainMenuItems.Insert(3, "Transaction History");
@@ -51,8 +55,10 @@ namespace Project1Afdemp
                         mainMenuItems.Insert(3, "Manage Users");
                     }
 
+                    // Acquire the choice of function from the user using a vertical menu
                     string userChoice = Menus.VerticalMenu(StringsFormatted.MainMenu, mainMenuItems);
 
+                    // Check what the user chose and act accordingly
                     if (userChoice.Contains("Chat"))
                     {
                         MenuFunctions.ShowChat(activeUserManager);
@@ -61,9 +67,9 @@ namespace Project1Afdemp
                     {
                         MenuFunctions.SendEmail(activeUserManager);
                     }
-                    else if (userChoice.Contains("Read Received"))
+                    else if (userChoice.Contains("Inbox"))
                     {
-                        MenuFunctions.ReadReceived(activeUserManager);
+                        MenuFunctions.SelectMessageAction(activeUserManager);
                     }
                     else if (userChoice.Contains("Transaction History"))
                     {

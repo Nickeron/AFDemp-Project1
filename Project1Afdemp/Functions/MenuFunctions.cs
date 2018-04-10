@@ -121,19 +121,26 @@ namespace Project1Afdemp
                 Console.ReadKey();
             }
         }
-
-        public static void ReadReceived(UserManager activeUserManager)
+        
+        public static void SelectMessageAction(UserManager activeUserManager)
         {
-            Message receivedMessage = SideFunctions.SelectMessage(activeUserManager);
-            if (receivedMessage is null) { return; }
-            Console.Write($"\n\n\tTitle: {receivedMessage.Title}\n\n\tBody: {receivedMessage.Body}\n\n\tOK");
-            using (var database = new DatabaseStuff())
+            string userChoice;
+            do
             {
-                Message readMessage = database.Messages.Single(m => m.Id == receivedMessage.Id);
-                readMessage.IsRead = true;
-                database.SaveChanges();
+                Message receivedMessage = SideFunctions.SelectMessage(activeUserManager);
+                if (receivedMessage is null) { return; }
+                List<string> messageOptions = new List<string> { "Read", "Delete", "Back" };
+                userChoice = Menus.VerticalMenu(StringsFormatted.Options, messageOptions);
+                if (userChoice.Contains("Read"))
+                {
+                    SideFunctions.ReadReceivedMessage(receivedMessage);
+                }
+                else if (userChoice.Contains("Delete"))
+                {
+                    SideFunctions.DeleteMessage(receivedMessage);
+                }
             }
-            Console.ReadKey();
+            while (!userChoice.Contains("Back"));
         }
 
         public static void TransactionHistory(UserManager activeUserManager)
