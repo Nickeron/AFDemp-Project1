@@ -187,15 +187,17 @@ namespace Project1Afdemp
             else
             {
                 UserAccess = UserDatabase.Users.Single(u => u.UserName == UserName).UserAccess;
-            }
-            
+            }  
         }
 
         public void ClearUnreadChat()
         {
-            TheUser.IdsUnreadChatMessages = "";
-            UserDatabase.SaveChanges();
+            using(var database = new DatabaseStuff())
+            {
+                TheUser = database.Users.Single(u => u.UserName == UserName);
+                TheUser.IdsUnreadChatMessages = "";
+                database.SaveChanges();
+            }
         }
-
     }
 }
