@@ -64,12 +64,15 @@ namespace Project1Afdemp
                 string chat = StringsFormatted.Chat + "\n\n";
                 using (var database = new DatabaseStuff())
                 {
-                    var chatMessages = database.Chat.OrderBy(i => i.Id);
+                    User activeUser = database.Users.Single(u => u.UserName == activeUserManager.UserName);
+                    var chatMessages = database.Chat.Include("UnreadUsers").OrderBy(i => i.Id);
+                    bool firstNewMessage = true;
                     foreach (var message in chatMessages)
                     {
-                        if (message.Id.ToString().Equals(database.Users.Single(c => c.UserName == activeUserManager.UserName).IdsUnreadChatMessages.Split(' ').FirstOrDefault()))
+                        if (message.UnreadUsers.Contains(activeUser) && firstNewMessage)
                         {
                             chat += "\n\t__________________________NEW__________________________\n";
+                            firstNewMessage = false;
                         }
                         chat += "\n\t" + message.TimeSent.ToString("MM/dd HH:mm") + "   " +
                             (database.Users.Single(i => i.Id == message.SenderId).UserName.ToString() + ":").PadRight(15) +
@@ -81,16 +84,16 @@ namespace Project1Afdemp
                         break;
                     }
                     Console.Clear();
-                    Console.Write(chat + "\n\n\t" + activeUserManager.UserName + ": ");
-                    ChatMessage newReply = new ChatMessage(activeUserManager.TheUser.Id, Console.ReadLine());
-                    database.Chat.Add(newReply);
-                    database.SaveChanges();
-                    ChatMessage freshReply = database.Chat.OrderByDescending(t => t.TimeSent).First();
-                    var unReadUsers = database.Users.Where(u => u.UserName != activeUserManager.UserName);
-                    foreach (User unreadUser in unReadUsers)
+                    Console.Write(chat + "\n\n\t" + activeUser.UserName + ": ");
+ 
+                    var unreadUsers = database.Users.Where(u => u.UserName != activeUser.UserName).ToList();
+                    database.Chat.Add(new ChatMessage
                     {
-                        unreadUser.IdsUnreadChatMessages += freshReply.Id.ToString() + ' ';
-                    }
+                        Sender = activeUser,
+                        Text = Console.ReadLine(),
+                        UnreadUsers = unreadUsers,
+                        TimeSent = DateTime.Now
+                    });
                     database.SaveChanges();
                 }
             }

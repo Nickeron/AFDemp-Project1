@@ -8,6 +8,7 @@ namespace Project1Afdemp
     {
         static void Main(string[] args)
         {
+            Console.Title = "Chat@Bootcamp";
             // If database is empty create the 2 basic users firsthand.
             using (var database = new DatabaseStuff())
             {
@@ -40,7 +41,7 @@ namespace Project1Afdemp
                 {
                     // Probe the database for the nuber of unread messages in chat and unread mail
                     int unreadMessages = database.Messages.Count(m => m.IsRead == false && m.Receiver.Id == activeUserManager.TheUser.Id);
-                    int unreadChat = database.Users.Single(c=> c.UserName==activeUserManager.UserName).IdsUnreadChatMessages.Split(' ').Length-1;
+                    int unreadChat = database.Users.Include("UnreadChatMessages").Single(c=> c.UserName == activeUserManager.UserName).UnreadChatMessages.Count;
 
                     // Create the Menu items common to all users
                     List<string> mainMenuItems = new List<string> { $"Chat ({unreadChat})", "Send Email", $"Inbox ({unreadMessages})", "Log Out", "Exit" };

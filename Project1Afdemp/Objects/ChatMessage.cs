@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Project1Afdemp
 {
@@ -10,11 +11,14 @@ namespace Project1Afdemp
         public string Text { get; set; }
 
         public int SenderId { get; set; }
+        public User Sender { get; set; }
 
-        // Virtual in this context means nullable
-        public virtual User Sender { get; set; }
+        public ICollection<User> UnreadUsers { get; set; }
 
-        public ChatMessage() { }
+        public ChatMessage()
+        {
+            UnreadUsers = new List<User>();
+        }
 
         public ChatMessage(int senderid, string text)
         {

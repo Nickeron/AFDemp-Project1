@@ -11,7 +11,15 @@ namespace Project1Afdemp
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>()
-                        .HasKey(m => m.Id);
+                        .HasKey(m => m.Id)
+                        .HasMany(s => s.UnreadChatMessages)
+                        .WithMany(c => c.UnreadUsers)
+                        .Map(cs =>
+                        {
+                            cs.MapLeftKey("UserRefId");
+                            cs.MapRightKey("ChatMessageRefId");
+                            cs.ToTable("UnreadChatMessages");
+                        });
 
             modelBuilder.Entity<Message>()
                         .HasRequired(m => m.Sender)
@@ -28,12 +36,6 @@ namespace Project1Afdemp
             modelBuilder.Entity<ChatMessage>()
                         .HasRequired(m => m.Sender)
                         .WithMany(t => t.SentChatMessages)
-                        .HasForeignKey(m => m.SenderId)
-                        .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<ChatMessage>()
-                        .HasRequired(m => m.Sender)
-                        .WithMany(t => t.UnreadChatMessages)
                         .HasForeignKey(m => m.SenderId)
                         .WillCascadeOnDelete(false);
         }

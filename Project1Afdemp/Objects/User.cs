@@ -9,9 +9,6 @@ namespace Project1Afdemp
         public string UserName { get; private set; }
         public string Password { get; private set; }
         public Accessibility UserAccess { get; set; }
-        public string IdsUnreadChatMessages { get; set; }
-
-        private User() { }
 
         // Virtual in this context means nullable
         public virtual ICollection<Message> ReceivedMessages { get; set; }
@@ -19,12 +16,19 @@ namespace Project1Afdemp
         public virtual ICollection<ChatMessage> SentChatMessages { get; set; }
         public virtual ICollection<ChatMessage> UnreadChatMessages { get; set; }
 
+        private User()
+        {
+            ReceivedMessages    = new List<Message>();
+            SentMessages        = new List<Message>();
+            SentChatMessages    = new List<ChatMessage>();
+            UnreadChatMessages  = new List<ChatMessage>();
+        }
+
         public User(string username, string password, Accessibility userAccess)
         {
             UserName = username;
             Password = password;
             UserAccess = userAccess;
-            IdsUnreadChatMessages = "";
         }
     }
 }

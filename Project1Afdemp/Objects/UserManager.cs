@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Project1Afdemp
@@ -9,14 +10,9 @@ namespace Project1Afdemp
         public string UserName { get; private set; }
         public string Password { get; private set; }
         public Accessibility UserAccess { get; private set; }
-        private static DatabaseStuff UserDatabase { get; set; }
         private int LoginTries { get; set; }
 
         #region Constructors
-        static UserManager()
-        {
-            UserDatabase = new DatabaseStuff();
-        }
 
         public UserManager(string userName, string password, bool isNewUser = false)
         {
@@ -40,18 +36,22 @@ namespace Project1Afdemp
             }
             SetAccessibility(isNewUser);
             // If is new user create a user to database
-            if (isNewUser)
+            using (var database = new DatabaseStuff())
             {
-                try
+                if (isNewUser)
                 {
-                    UserDatabase.Users.Add(new User(UserName, Password, UserAccess));
-                    UserDatabase.SaveChanges();
-                }catch(Exception e)
-                {
-                    Console.WriteLine(e.Message + " User could not get created");
+                    try
+                    {
+                        database.Users.Add(new User(UserName, Password, UserAccess));
+                        database.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message + " User could not get created");
+                    }
                 }
+                TheUser = database.Users.Single(u => u.UserName == UserName);
             }
-            TheUser = UserDatabase.Users.Single(u => u.UserName == UserName); 
         }
 
         public UserManager(bool isNewUser = false) : this("", "", isNewUser) { }
@@ -110,7 +110,10 @@ namespace Project1Afdemp
 
         private bool UserNameAlreadyExists(string userName)
         {
-            return UserDatabase.Users.Any(i => i.UserName == userName);
+            using (var database = new DatabaseStuff())
+            {
+                return database.Users.Any(i => i.UserName == userName);
+            }
         }
         #endregion
 
@@ -161,9 +164,12 @@ namespace Project1Afdemp
 
         private bool IDmatched(string password)
         {
-            string passHash = UserDatabase.Users.Single(i => i.UserName == UserName).Password;
-            string givenPass = PasswordHandling.PasswordToHash(PasswordHandling.ConvertToSecureString(password), UserName);
-            return (givenPass == passHash);
+            using (var database = new DatabaseStuff())
+            {
+                string passHash = database.Users.Single(i => i.UserName == UserName).Password;
+                string givenPass = PasswordHandling.PasswordToHash(PasswordHandling.ConvertToSecureString(password), UserName);
+                return (givenPass == passHash);
+            }
         }
         #endregion
 
@@ -186,7 +192,10 @@ namespace Project1Afdemp
             }
             else
             {
-                UserAccess = UserDatabase.Users.Single(u => u.UserName == UserName).UserAccess;
+                using (var database = new DatabaseStuff())
+                {
+                    UserAccess = database.Users.Single(u => u.UserName == UserName).UserAccess;
+                }
             }  
         }
 
@@ -195,7 +204,12 @@ namespace Project1Afdemp
             using(var database = new DatabaseStuff())
             {
                 TheUser = database.Users.Single(u => u.UserName == UserName);
-                TheUser.IdsUnreadChatMessages = "";
+                List<ChatMessage> UnreadChatMessages = database.Chat.Include("UnreadUsers").Where(c=> c.SenderId!=TheUser.Id).ToList();
+
+                foreach(ChatMessage message in UnreadChatMessages)
+                {
+                    message.UnreadUsers.Remove(TheUser);
+                }
                 database.SaveChanges();
             }
         }
