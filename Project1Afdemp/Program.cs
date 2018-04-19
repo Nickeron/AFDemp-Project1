@@ -71,11 +71,11 @@ namespace Project1Afdemp
                     }
                     else if (userChoice.Contains("Inbox"))
                     {
-                        MenuFunctions.SelectMessageAction(activeUserManager);
+                        MenuFunctions.PresentAndManipulateMessage(activeUserManager);
                     }
                     else if (userChoice.Contains("Sent"))
                     {
-                        MenuFunctions.SelectMessageAction(activeUserManager, Received:false);
+                        MenuFunctions.PresentAndManipulateMessage(activeUserManager, Received:false);
                     }
                     else if (userChoice.Contains("Messages History"))
                     {

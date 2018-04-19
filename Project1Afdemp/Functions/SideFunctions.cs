@@ -104,7 +104,29 @@ namespace Project1Afdemp
             }
         }
 
-        
+        public static void UpdateEmail(UserManager activeUserManager, Message editMessage)
+        {
+            Console.Write("\n\n\n\n\tNew Title: ");
+            string newMessageTitle = Console.ReadLine();
+
+            Console.Write("\n\tNew Body: ");
+            string newMessageBody = Console.ReadLine();
+
+            using (var database = new DatabaseStuff())
+            {
+                try
+                {
+                    Message newMessage = database.Messages.Single(m=>m.Id == editMessage.Id);
+                    newMessage.Title = newMessageTitle;
+                    newMessage.Body = newMessageBody;
+                    newMessage.IsRead = false;
+                    database.SaveChanges();
+                    Console.Write($"\n\n\tEmail updated successfully\n\n\tOK");
+                }
+                catch (Exception e) { MenuFunctions.PrintException(e); }
+                Console.ReadKey(true);
+            }
+        }
 
         public static void ForwardMessage(UserManager activeUserManager, Message forwardMessage)
         {

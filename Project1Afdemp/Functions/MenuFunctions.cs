@@ -58,7 +58,7 @@ namespace Project1Afdemp
                             (database.Users.Single(i => i.Id == message.SenderId).UserName.ToString() 
                             + ":").PadRight(15) + message.Text + '\n';
                     }
-                    // Since by this point the user read the new messages
+                    // Since by the next point the user read the new messages
                     activeUserManager.ClearUnreadChat();
 
                     // Does the user wish to reply?
@@ -120,7 +120,7 @@ namespace Project1Afdemp
             }
         }
         
-        public static void SelectMessageAction(UserManager activeUserManager, bool Received = true)
+        public static void PresentAndManipulateMessage(UserManager activeUserManager, bool Received = true)
         {
             string userChoice;
             do
@@ -132,6 +132,9 @@ namespace Project1Afdemp
                 List<string> messageOptions = new List<string> { "Forward", "Delete", "Back" };
                 if (Received)
                 { messageOptions.Insert(1, "Reply"); }
+                else
+                { messageOptions.Insert(1, "Edit"); }
+
                 userChoice = Menus.HorizontalMenu(presentedMessage, messageOptions);
                 using (var database = new DatabaseStuff())
                 {
@@ -144,8 +147,11 @@ namespace Project1Afdemp
                     }
                     else if (userChoice.Contains("Reply"))
                     {
-
                         SendEmail(activeUserManager, database.Users.Single(u => u.Id == readMessage.Sender.Id));
+                    }
+                    else if (userChoice.Contains("Edit"))
+                    {
+                        SideFunctions.UpdateEmail(activeUserManager, selectedMessage);
                     }
                     else if (userChoice.Contains("Delete"))
                     {
@@ -214,7 +220,7 @@ namespace Project1Afdemp
             return activeUserManager;
         }
 
-        private static void PrintException(Exception e)
+        public static void PrintException(Exception e)
         {
             Console.Clear();
             Console.BackgroundColor = ConsoleColor.Red;
