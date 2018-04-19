@@ -40,11 +40,11 @@ namespace Project1Afdemp
                 using (var database = new DatabaseStuff())
                 {
                     // Probe the database for the nuber of unread messages in chat and unread mail
-                    int unreadMessages = database.Messages.Count(m => m.IsRead == false && m.Receiver.Id == activeUserManager.TheUser.Id);
-                    int unreadChat = database.Users.Include("UnreadChatMessages").Single(c=> c.UserName == activeUserManager.UserName).UnreadChatMessages.Count;
+                    int unreadMessages = database.Messages.Count(message => message.IsRead == false && message.Receiver.Id == activeUserManager.TheUser.Id);
+                    int unreadChatMessages = database.Users.Include("UnreadChatMessages").Single(c=> c.UserName == activeUserManager.UserName).UnreadChatMessages.Count;
 
                     // Create the Menu items common to all users
-                    List<string> mainMenuItems = new List<string> { $"Chat ({unreadChat})", "Send Email", $"Inbox ({unreadMessages})", "Log Out", "Exit" };
+                    List<string> mainMenuItems = new List<string> { $"Chat ({unreadChatMessages})", "Send Email", $"Inbox ({unreadMessages})", "Log Out", "Exit" };
 
                     // Add more options for User and Administrator access.
                     if (activeUserManager.UserAccess == Accessibility.administrator || activeUserManager.UserAccess == Accessibility.user)

@@ -5,52 +5,26 @@ using System.Threading;
 
 namespace Project1Afdemp
 {
-    class MenuFunctions
+    static class MenuFunctions
     {
         public static UserManager LoginScreen()
         {
-            UserManager activeUserManager;
             while (true)
             {
-                List<string> signOrLogItems = new List<string> { "Sign Up", "Log In" };
-                string userChoice = Menus.HorizontalMenu(StringsFormatted.Welcome, signOrLogItems);
+                string userChoice = Menus.HorizontalMenu(StringsFormatted.Welcome, new List<string> { "Sign Up", "Log In" });
                 using (var database = new DatabaseStuff())
                 {
                     if (userChoice == "Log In")
                     {
                         try
-                        {
-                            activeUserManager = new UserManager();
-                            Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUserManager.UserAccess} {activeUserManager.UserName}");
-                            Thread.Sleep(1200);
-                            return activeUserManager;
-                        }
-                        catch (Exception e)
-                        {
-                            Console.Clear();
-                            Console.BackgroundColor = ConsoleColor.Red;
-                            Console.WriteLine(e.Message);
-                            Thread.Sleep(1200);
-                            Console.ResetColor();
-                        }
+                        { return SuccessfullLogin(isNewUser: false); }
+                        catch (Exception e) { PrintException(e); }
                     }
                     else
                     {
                         try
-                        {
-                            activeUserManager = new UserManager(true);
-                            Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUserManager.UserAccess} {activeUserManager.UserName}");
-                            Thread.Sleep(1200);
-                            return activeUserManager;
-                        }
-                        catch (Exception e)
-                        {
-                            Console.Clear();
-                            Console.BackgroundColor = ConsoleColor.Red;
-                            Console.WriteLine(e.Message);
-                            Thread.Sleep(1200);
-                            Console.ResetColor();
-                        }
+                        { return SuccessfullLogin(isNewUser: true); }
+                        catch (Exception e)  { PrintException(e); }
                     }
                 }
             }
@@ -64,9 +38,15 @@ namespace Project1Afdemp
                 string chat = StringsFormatted.Chat + "\n\n";
                 using (var database = new DatabaseStuff())
                 {
+                    // Access the active user from Database
                     User activeUser = database.Users.Single(u => u.UserName == activeUserManager.UserName);
+
+                    // Get all the chat messages ordered increasingly and 
+                    // access the users haven't read them yet.
                     var chatMessages = database.Chat.Include("UnreadUsers").OrderBy(i => i.Id);
+
                     bool firstNewMessage = true;
+
                     foreach (var message in chatMessages)
                     {
                         if (message.UnreadUsers.Contains(activeUser) && firstNewMessage)
@@ -75,18 +55,24 @@ namespace Project1Afdemp
                             firstNewMessage = false;
                         }
                         chat += "\n\t" + message.TimeSent.ToString("MM/dd HH:mm") + "   " +
-                            (database.Users.Single(i => i.Id == message.SenderId).UserName.ToString() + ":").PadRight(15) +
-                            message.Text + '\n';
+                            (database.Users.Single(i => i.Id == message.SenderId).UserName.ToString() 
+                            + ":").PadRight(15) + message.Text + '\n';
                     }
+                    // Since by this point the user read the new messages
                     activeUserManager.ClearUnreadChat();
+
+                    // Does the user wish to reply?
                     if (Menus.HorizontalMenu(chat, new List<string> { "Reply", "Back" }).Contains("Back"))
-                    {
-                        break;
-                    }
+                    { break; }
+
+                    // Rewrite the whole chat with the username added at the bottom
                     Console.Clear();
                     Console.Write(chat + "\n\n\t" + activeUser.UserName + ": ");
  
+                    // Collect all the other users in a list
                     var unreadUsers = database.Users.Where(u => u.UserName != activeUser.UserName).ToList();
+
+                    // Create the new chat message
                     database.Chat.Add(new ChatMessage
                     {
                         Sender = activeUser,
@@ -129,7 +115,7 @@ namespace Project1Afdemp
                     database.SaveChanges();
                     Console.Write($"\n\n\tEmail sent successfully to {receiver.UserName}\n\n\tOK");
                 }
-                catch (Exception e) { Console.WriteLine(e); }
+                catch (Exception e) { PrintException(e); }
                 Console.ReadKey();
             }
         }
@@ -171,10 +157,10 @@ namespace Project1Afdemp
                     {
                         senderName = database.Users.Single(i => i.Id == message.SenderId).UserName;
                         receiverName = database.Users.Single(i => i.Id == message.ReceiverId).UserName;
-                        Console.WriteLine($"\tAt {message.TimeSent}, {senderName} sent a mail to {receiverName} with a title: '{message.Title}'");
+                        Console.WriteLine($"\t{message.TimeSent} {senderName} sent a mail to {receiverName} with a title: '{message.Title}'");
                     }
                 }
-                catch (Exception e) { Console.WriteLine(e); }
+                catch (Exception e) { PrintException(e); }
                 Console.Write("\n\n\tOK");
                 Console.ReadKey();
             }
@@ -203,6 +189,23 @@ namespace Project1Afdemp
             {
                 SideFunctions.ChangeUserPermissions(receiver);
             }
+        }
+
+        private static UserManager SuccessfullLogin(bool isNewUser)
+        {
+            UserManager activeUserManager = new UserManager(isNewUser);
+            Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUserManager.UserAccess} {activeUserManager.UserName}");
+            Thread.Sleep(1200);
+            return activeUserManager;
+        }
+
+        private static void PrintException(Exception e)
+        {
+            Console.Clear();
+            Console.BackgroundColor = ConsoleColor.Red;
+            Console.WriteLine(e.Message + "\n\n\tBack");
+            Console.ReadKey();
+            Console.ResetColor();
         }
     }
 }
