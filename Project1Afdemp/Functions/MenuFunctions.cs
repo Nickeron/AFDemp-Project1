@@ -120,28 +120,43 @@ namespace Project1Afdemp
             }
         }
         
-        public static void SelectMessageAction(UserManager activeUserManager)
+        public static void SelectMessageAction(UserManager activeUserManager, bool Received = true)
         {
             string userChoice;
             do
             {
-                Message receivedMessage = SideFunctions.SelectMessage(activeUserManager);
-                if (receivedMessage is null) { return; }
-                List<string> messageOptions = new List<string> { "Read", "Delete", "Back" };
-                userChoice = Menus.VerticalMenu(StringsFormatted.Options, messageOptions);
-                if (userChoice.Contains("Read"))
+                Message selectedMessage = SideFunctions.SelectMessage(activeUserManager, Received);
+                if (selectedMessage is null) { return; }
+                string presentedMessage = StringsFormatted.ReadEmails + $"\n\n\tTitle: {selectedMessage.Title}" +
+                    $"\n\n\tBody: {selectedMessage.Body}\n\n";
+                List<string> messageOptions = new List<string> { "Forward", "Delete", "Back" };
+                if (Received)
+                { messageOptions.Insert(1, "Reply"); }
+                userChoice = Menus.HorizontalMenu(presentedMessage, messageOptions);
+                using (var database = new DatabaseStuff())
                 {
-                    SideFunctions.ReadReceivedMessage(activeUserManager, receivedMessage);
-                }
-                else if (userChoice.Contains("Delete"))
-                {
-                    SideFunctions.DeleteMessage(receivedMessage);
+                    Message readMessage = database.Messages.Single(m => m.Id == selectedMessage.Id);
+                    readMessage.IsRead = true;
+                    database.SaveChanges();
+                    if (userChoice.Contains("Forward"))
+                    {
+                        SideFunctions.ForwardMessage(activeUserManager, selectedMessage);
+                    }
+                    else if (userChoice.Contains("Reply"))
+                    {
+
+                        SendEmail(activeUserManager, database.Users.Single(u => u.Id == readMessage.Sender.Id));
+                    }
+                    else if (userChoice.Contains("Delete"))
+                    {
+                        SideFunctions.DeleteMessage(selectedMessage);
+                    }
                 }
             }
             while (!userChoice.Contains("Back"));
         }
 
-        public static void TransactionHistory(UserManager activeUserManager)
+        public static void CommunicationHistory(UserManager activeUserManager)
         {
             Console.Clear();
             Console.WriteLine(StringsFormatted.History + '\n');
@@ -157,7 +172,7 @@ namespace Project1Afdemp
                     {
                         senderName = database.Users.Single(i => i.Id == message.SenderId).UserName;
                         receiverName = database.Users.Single(i => i.Id == message.ReceiverId).UserName;
-                        Console.WriteLine($"\t{message.TimeSent} {senderName} sent a mail to {receiverName} with a title: '{message.Title}'");
+                        Console.WriteLine($"\t{message.TimeSent} {senderName} sent '{message.Title}' to {receiverName}");
                     }
                 }
                 catch (Exception e) { PrintException(e); }

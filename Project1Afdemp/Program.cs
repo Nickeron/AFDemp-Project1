@@ -41,19 +41,20 @@ namespace Project1Afdemp
                 {
                     // Probe the database for the nuber of unread messages in chat and unread mail
                     int unreadMessages = database.Messages.Count(message => message.IsRead == false && message.Receiver.Id == activeUserManager.TheUser.Id);
+                    int sentMessages   = database.Messages.Count(message => message.Sender.Id == activeUserManager.TheUser.Id);
                     int unreadChatMessages = database.Users.Include("UnreadChatMessages").Single(c=> c.UserName == activeUserManager.UserName).UnreadChatMessages.Count;
 
                     // Create the Menu items common to all users
-                    List<string> mainMenuItems = new List<string> { $"Chat ({unreadChatMessages})", "Send Email", $"Inbox ({unreadMessages})", "Log Out", "Exit" };
+                    List<string> mainMenuItems = new List<string> { $"Chat  ({unreadChatMessages})", "Send Email", $"Inbox ({unreadMessages})", $"Sent  ({sentMessages})", "Log Out", "Exit" };
 
                     // Add more options for User and Administrator access.
                     if (activeUserManager.UserAccess == Accessibility.administrator || activeUserManager.UserAccess == Accessibility.user)
                     {
-                        mainMenuItems.Insert(3, "Transaction History");
+                        mainMenuItems.Insert(4, "Messages History");
                     }
                     if (activeUserManager.UserAccess == Accessibility.administrator)
                     {
-                        mainMenuItems.Insert(3, "Manage Users");
+                        mainMenuItems.Insert(4, "Manage Users");
                     }
 
                     // Acquire the choice of function from the user using a vertical menu
@@ -72,9 +73,13 @@ namespace Project1Afdemp
                     {
                         MenuFunctions.SelectMessageAction(activeUserManager);
                     }
-                    else if (userChoice.Contains("Transaction History"))
+                    else if (userChoice.Contains("Sent"))
                     {
-                        MenuFunctions.TransactionHistory(activeUserManager);
+                        MenuFunctions.SelectMessageAction(activeUserManager, Received:false);
+                    }
+                    else if (userChoice.Contains("Messages History"))
+                    {
+                        MenuFunctions.CommunicationHistory(activeUserManager);
                     }
                     else if (userChoice.Contains("Manage Users"))
                     {

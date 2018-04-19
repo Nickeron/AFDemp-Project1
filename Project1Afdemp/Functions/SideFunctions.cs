@@ -41,32 +41,44 @@ namespace Project1Afdemp
             }
         }
 
-        public static Message SelectMessage(UserManager activeUserManager)
+        public static Message SelectMessage(UserManager activeUserManager, bool Received)
         {
             List<string> selectMessageItems = new List<string>();
             using (var database = new DatabaseStuff())
             {
                 List<Message> messages = database.Messages.ToList();
-                int receiverId = database.Users.Single(i => i.UserName == activeUserManager.UserName).Id;
-                string senderName;
+                int UserId = database.Users.Single(i => i.UserName == activeUserManager.UserName).Id;
+                string receiverName;
                 try
                 {
                     string listedMessage;
                     foreach (Message message in messages)
                     {
-                        if (message.ReceiverId == receiverId)
+                        if (Received)
                         {
-                            senderName = database.Users.Single(i => i.Id == message.SenderId).UserName;
-                            if (!message.IsRead)
+                            if (message.ReceiverId == UserId)
                             {
-                                listedMessage = "* ";
+                                receiverName = database.Users.Single(i => i.Id == message.SenderId).UserName;
+                                if (!message.IsRead)
+                                {
+                                    listedMessage = "* ";
+                                }
+                                else
+                                {
+                                    listedMessage = "";
+                                }
+                                listedMessage += $"ID: |{message.Id}| From: |{receiverName}| Title: |{message.Title}| Time Sent: |{message.TimeSent}|";
+                                selectMessageItems.Add(listedMessage);
                             }
-                            else
+                        }
+                        else
+                        {
+                            if (message.SenderId == UserId)
                             {
-                                listedMessage = "";
+                                receiverName = database.Users.Single(i => i.Id == message.ReceiverId).UserName;
+                                listedMessage = $"ID: |{message.Id}| To: |{receiverName}| Title: |{message.Title}| Time Sent: |{message.TimeSent}|";
+                                selectMessageItems.Add(listedMessage);
                             }
-                            listedMessage += $"ID: |{message.Id}| From: |{senderName}| Title: |{message.Title}| Time Sent: |{message.TimeSent}|";
-                            selectMessageItems.Add(listedMessage);
                         }
                     }
                 }
@@ -92,26 +104,7 @@ namespace Project1Afdemp
             }
         }
 
-        public static void ReadReceivedMessage(UserManager activeUserManager, Message receivedMessage)
-        {
-            List<string> forwardReplyItems = new List<string> { "Forward", "Reply", "Back" };
-            string presentedMessage = StringsFormatted.ReadEmails +$"\n\n\tTitle: {receivedMessage.Title}\n\n\tBody: {receivedMessage.Body}";
-            string readMessageReaction = Menus.HorizontalMenu(presentedMessage, forwardReplyItems);
-            using (var database = new DatabaseStuff())
-            {
-                Message readMessage = database.Messages.Single(m => m.Id == receivedMessage.Id);
-                readMessage.IsRead = true;
-                database.SaveChanges();
-                if (readMessageReaction.Contains("Forward"))
-                {
-                    ForwardMessage(activeUserManager, receivedMessage);
-                }
-                else if (readMessageReaction.Contains("Reply"))
-                {
-                    MenuFunctions.SendEmail(activeUserManager, database.Users.Single(u=> u.Id == readMessage.Sender.Id));
-                }
-            } 
-        }
+        
 
         public static void ForwardMessage(UserManager activeUserManager, Message forwardMessage)
         {
