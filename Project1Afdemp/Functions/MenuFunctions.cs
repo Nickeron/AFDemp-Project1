@@ -54,33 +54,41 @@ namespace Project1Afdemp
                             chat += "\n\t__________________________NEW__________________________\n";
                             firstNewMessage = false;
                         }
-                        chat += "\n\t" + message.TimeSent.ToString("MM/dd HH:mm") + "   " +
+                        chat += "\n\t" + message.TimeSent.ToString("dd/MM HH:mm") + "   " +
                             (database.Users.Single(i => i.Id == message.SenderId).UserName.ToString()
                             + ":").PadRight(15) + message.Text + '\n';
                     }
                     // Since by the next point the user read the new messages
                     activeUserManager.ClearUnreadChat();
 
-                    // Does the user wish to reply?
-                    if (Menus.HorizontalMenu(chat, new List<string> { "Reply", "Back" }).Contains("Back"))
+
+                    List<string> chatOptions = new List<string> { "Reply", "Back" };
+                    if (activeUser.UserAccess == Accessibility.administrator && database.Chat.Any())
+                    {
+                        chatOptions.Insert(1, "Edit");
+                        chatOptions.Insert(2, "Delete All");
+                    }
+                    string userChoice = Menus.HorizontalMenu(chat, chatOptions);
+
+                    // Does the user wish to leave?
+                    if (userChoice.Contains("Back"))
                     { break; }
 
-                    // Rewrite the whole chat with the username added at the bottom
-                    Console.Clear();
-                    Console.Write(chat + "\n\n\t" + activeUser.UserName + ": ");
-
-                    // Collect all the other users in a list
-                    var unreadUsers = database.Users.Where(u => u.UserName != activeUser.UserName).ToList();
-
-                    // Create the new chat message
-                    database.Chat.Add(new ChatMessage
+                    // Or edit the chat Messages
+                    else if (userChoice.Contains("Edit"))
                     {
-                        Sender = activeUser,
-                        Text = Console.ReadLine(),
-                        UnreadUsers = unreadUsers,
-                        TimeSent = DateTime.Now
-                    });
-                    database.SaveChanges();
+                        ChatFunctions.EditChatMessages();
+                    }
+                    // Maybe delete them all?
+                    else if (userChoice.Contains("Delete All"))
+                    {
+                        ChatFunctions.DeleteAllChatMessages();
+                    }
+                    // Or add a reply
+                    else
+                    {
+                        ChatFunctions.AddReplyToChat(activeUserManager, chat);
+                    }
                 }
             }
         }

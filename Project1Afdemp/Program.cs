@@ -48,13 +48,14 @@ namespace Project1Afdemp
                     List<string> mainMenuItems = new List<string> { $"Chat  ({unreadChatMessages})", "Send Email", $"Inbox ({unreadMessages})", $"Sent  ({sentMessages})", "Log Out", "Exit" };
 
                     // Add more options for User and Administrator access.
-                    if (activeUserManager.UserAccess == Accessibility.administrator || activeUserManager.UserAccess == Accessibility.user)
-                    {
-                        mainMenuItems.Insert(4, "Messages History");
-                    }
                     if (activeUserManager.UserAccess == Accessibility.administrator)
                     {
-                        mainMenuItems.Insert(4, "Manage Users");
+                        mainMenuItems.Insert(3, "Manage Users");
+                        mainMenuItems.Insert(4, "Messages History");
+                    }
+                    else if (activeUserManager.UserAccess == Accessibility.user)
+                    {
+                        mainMenuItems.Insert(4, "Messages History");
                     }
 
                     // Acquire the choice of function from the user using a vertical menu
