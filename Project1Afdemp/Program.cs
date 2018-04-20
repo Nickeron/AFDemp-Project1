@@ -12,7 +12,7 @@ namespace Project1Afdemp
             // If database is empty create the 2 basic users firsthand.
             using (var database = new DatabaseStuff())
             {
-                if (database.Users.Count().Equals(0))
+                if (!database.Users.Any())
                 {
                     try
                     {

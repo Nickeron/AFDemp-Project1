@@ -43,11 +43,11 @@ namespace Project1Afdemp
 
                     // Get all the chat messages ordered increasingly and 
                     // access the users haven't read them yet.
-                    var chatMessages = database.Chat.Include("UnreadUsers").OrderBy(i => i.Id);
+                    List<ChatMessage> chatMessages = database.Chat.Include("UnreadUsers").OrderBy(i => i.Id).ToList();
 
                     bool firstNewMessage = true;
 
-                    foreach (var message in chatMessages)
+                    foreach (ChatMessage message in chatMessages)
                     {
                         if (message.UnreadUsers.Contains(activeUser) && firstNewMessage)
                         {
@@ -108,7 +108,7 @@ namespace Project1Afdemp
             if (receiver is null) { return; }
             Console.WriteLine(StringsFormatted.SendEmail);
             Console.Write(title);
-            string MessageTitle = (receiver is null) ? Console.ReadLine() : "RE> " + reTitle;
+            string MessageTitle = (title.Contains("RE")) ? "RE> " + reTitle : Console.ReadLine();
 
             Console.Write("\n\tBody: ");
             string MessageBody = Console.ReadLine();
