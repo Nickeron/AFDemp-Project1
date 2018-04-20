@@ -24,7 +24,7 @@ namespace Project1Afdemp
                     {
                         try
                         { return SuccessfullLogin(isNewUser: true); }
-                        catch (Exception e)  { PrintException(e); }
+                        catch (Exception e) { PrintException(e); }
                     }
                 }
             }
@@ -55,7 +55,7 @@ namespace Project1Afdemp
                             firstNewMessage = false;
                         }
                         chat += "\n\t" + message.TimeSent.ToString("MM/dd HH:mm") + "   " +
-                            (database.Users.Single(i => i.Id == message.SenderId).UserName.ToString() 
+                            (database.Users.Single(i => i.Id == message.SenderId).UserName.ToString()
                             + ":").PadRight(15) + message.Text + '\n';
                     }
                     // Since by the next point the user read the new messages
@@ -68,7 +68,7 @@ namespace Project1Afdemp
                     // Rewrite the whole chat with the username added at the bottom
                     Console.Clear();
                     Console.Write(chat + "\n\n\t" + activeUser.UserName + ": ");
- 
+
                     // Collect all the other users in a list
                     var unreadUsers = database.Users.Where(u => u.UserName != activeUser.UserName).ToList();
 
@@ -85,22 +85,22 @@ namespace Project1Afdemp
             }
         }
 
-        public static void SendEmail(UserManager activeUserManager, User receiver = null)
+        public static void SendEmail(UserManager activeUserManager, User receiver = null, string reTitle = "")
         {
             string title;
-            if(receiver is null)
+            if (receiver is null)
             {
                 title = "\n\n\tTitle: ";
                 receiver = SideFunctions.SelectUser(activeUserManager);
             }
             else
             {
-                title = "\n\n\tTitle: RE>";
+                title = "\n\n\tTitle: RE> " + reTitle;
             }
             if (receiver is null) { return; }
             Console.WriteLine(StringsFormatted.SendEmail);
             Console.Write(title);
-            string MessageTitle = Console.ReadLine();
+            string MessageTitle = (receiver is null) ? Console.ReadLine() : "RE> " + reTitle;
 
             Console.Write("\n\tBody: ");
             string MessageBody = Console.ReadLine();
@@ -119,7 +119,7 @@ namespace Project1Afdemp
                 Console.ReadKey();
             }
         }
-        
+
         public static void PresentAndManipulateMessage(UserManager activeUserManager, bool Received = true)
         {
             string userChoice;
@@ -131,9 +131,9 @@ namespace Project1Afdemp
                     $"\n\n\tBody: {selectedMessage.Body}\n\n";
                 List<string> messageOptions = new List<string> { "Forward", "Delete", "Back" };
                 if (Received)
-                { messageOptions.Insert(1, "Reply"); }
+                { messageOptions.Insert(0, "Reply"); }
                 else
-                { messageOptions.Insert(1, "Edit"); }
+                { messageOptions.Insert(0, "Edit"); }
 
                 userChoice = Menus.HorizontalMenu(presentedMessage, messageOptions);
                 using (var database = new DatabaseStuff())
@@ -147,7 +147,8 @@ namespace Project1Afdemp
                     }
                     else if (userChoice.Contains("Reply"))
                     {
-                        SendEmail(activeUserManager, database.Users.Single(u => u.Id == readMessage.Sender.Id));
+                        User toBeReplied = database.Users.Single(u => u.Id == readMessage.Sender.Id);
+                        SendEmail(activeUserManager, toBeReplied, readMessage.Title);
                     }
                     else if (userChoice.Contains("Edit"))
                     {
