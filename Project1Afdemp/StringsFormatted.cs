@@ -2,7 +2,7 @@
 {
     class StringsFormatted
     {
-        public static string Welcome = @"
+        public const string Welcome = @"
      __          __  _                          
      \ \        / / | |                         
       \ \  /\  / /__| | ___ ___  _ __ ___   ___ 
@@ -10,7 +10,7 @@
         \  /\  /  __/ | (_| (_) | | | | | |  __/
          \/  \/ \___|_|\___\___/|_| |_| |_|\___|";
 
-        public static string MainMenu = @"
+        public const string MainMenu = @"
       __  __       _         __  __                  
      |  \/  |     (_)       |  \/  |                 
      | \  / | __ _ _ _ __   | \  / | ___ _ __  _   _ 
@@ -18,7 +18,15 @@
      | |  | | (_| | | | | | | |  | |  __/ | | | |_| |
      |_|  |_|\__,_|_|_| |_| |_|  |_|\___|_| |_|\__,_|";
 
-        public static string SendEmail = @"
+        public const string PersonalMessages = @"
+      _____  __  __ 
+     |  __ \|  \/  |
+     | |__) | \  / |
+     |  ___/| |\/| |
+     | |    | |  | |
+     |_|    |_|  |_|";
+
+        public const string SendEmail = @"
        _____                _ ______                 _ _ 
       / ____|              | |  ____|               (_) |
      | (___   ___ _ __   __| | |__   _ __ ___   __ _ _| |
@@ -26,7 +34,7 @@
       ____) |  __/ | | | (_| | |____| | | | | | (_| | | |
      |_____/ \___|_| |_|\__,_|______|_| |_| |_|\__,_|_|_|";
 
-        public static string ReadEmails = @"
+        public const string ReadEmails = @"
       _____                _ ______                 _ _     
      |  __ \              | |  ____|               (_) |    
      | |__) |___  __ _  __| | |__   _ __ ___   __ _ _| |___ 
@@ -34,7 +42,7 @@
      | | \ \  __/ (_| | (_| | |____| | | | | | (_| | | \__ \
      |_|  \_\___|\__,_|\__,_|______|_| |_| |_|\__,_|_|_|___/";
 
-        public static string History = @"
+        public const string History = @"
       _    _ _     _                   
      | |  | (_)   | |                  
      | |__| |_ ___| |_ ___  _ __ _   _ 
@@ -44,7 +52,7 @@
                                   __/ |
                                  |___/ ";
 
-        public static string ManageUsers = @"
+        public const string ManageUsers = @"
      __  __                              _    _                   
     |  \/  |                            | |  | |                  
     | \  / | __ _ _ __   __ _  __ _  ___| |  | |___  ___ _ __ ___ 
@@ -54,7 +62,7 @@
                                 __/ |                              
                                |___/ ";
 
-        public static string SelectUser = @"
+        public const string SelectUser = @"
       _____      _           _   _    _               
      / ____|    | |         | | | |  | |              
     | (___   ___| | ___  ___| |_| |  | |___  ___ _ __ 
@@ -62,7 +70,7 @@
      ____) |  __/ |  __/ (__| |_| |__| \__ \  __/ |   
     |_____/ \___|_|\___|\___|\__|\____/|___/\___|_| ";
 
-        public static string OpenMessage = @"
+        public const string OpenMessage = @"
        ____                   __  __                                
       / __ \                 |  \/  |                               
      | |  | |_ __   ___ _ __ | \  / | ___  ___ ___  __ _  __ _  ___ 
@@ -71,7 +79,7 @@
       \____/| .__/ \___|_| |_|_|  |_|\___||___/___/\__,_|\__, |\___|
             | |                                           __/ |     
             |_|                                          |___/  ";
-        public static string Chat = @"
+        public const string Chat = @"
            _           _   
           | |         | |  
        ___| |__   __ _| |_ 
@@ -79,7 +87,7 @@
      | (__| | | | (_| | |_ 
       \___|_| |_|\__,_|\__|";
 
-        public static string Options = @"
+        public const string Options = @"
         ____        _   _                 
        / __ \      | | (_)                
       | |  | |_ __ | |_ _  ___  _ __  ___ 

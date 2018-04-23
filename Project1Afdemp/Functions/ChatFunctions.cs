@@ -93,15 +93,9 @@ namespace Project1Afdemp
 
                 // Collect all the other users in a list
                 var unreadUsers = database.Users.Where(u => u.UserName != thisUser.UserName).ToList();
-
+                string replyText = Console.ReadLine();
                 // Create the new chat message
-                database.Chat.Add(new ChatMessage
-                {
-                    Sender = thisUser,
-                    Text = Console.ReadLine(),
-                    UnreadUsers = unreadUsers,
-                    TimeSent = DateTime.Now
-                });
+                database.Chat.Add(new ChatMessage (thisUser, replyText, unreadUsers));
                 database.SaveChanges();
             }
         }

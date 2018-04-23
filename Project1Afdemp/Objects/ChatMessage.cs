@@ -20,10 +20,11 @@ namespace Project1Afdemp
             UnreadUsers = new List<User>();
         }
 
-        public ChatMessage(int senderid, string text)
+        public ChatMessage(User sender, string text, ICollection<User> unreadUsers)
         {
-            SenderId = senderid;
+            Sender = sender;
             Text = text;
+            UnreadUsers = unreadUsers;
             TimeSent = DateTime.Now;
         }
     }

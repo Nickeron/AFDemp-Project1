@@ -40,22 +40,20 @@ namespace Project1Afdemp
                 using (var database = new DatabaseStuff())
                 {
                     // Probe the database for the nuber of unread messages in chat and unread mail
-                    int unreadMessages = database.Messages.Count(message => message.IsRead == false && message.Receiver.Id == activeUserManager.TheUser.Id);
-                    int sentMessages   = database.Messages.Count(message => message.Sender.Id == activeUserManager.TheUser.Id);
                     int unreadChatMessages = database.Users.Include("UnreadChatMessages").Single(c=> c.UserName == activeUserManager.UserName).UnreadChatMessages.Count;
 
                     // Create the Menu items common to all users
-                    List<string> mainMenuItems = new List<string> { $"Chat  ({unreadChatMessages})", "Send Email", $"Inbox ({unreadMessages})", $"Sent  ({sentMessages})", "Log Out", "Exit" };
+                    List<string> mainMenuItems = new List<string> { $"Chat ({unreadChatMessages})", "Personal Messages", "Log Out", "Exit" };
 
                     // Add more options for User and Administrator access.
                     if (activeUserManager.UserAccess == Accessibility.administrator)
                     {
-                        mainMenuItems.Insert(3, "Manage Users");
-                        mainMenuItems.Insert(4, "Messages History");
+                        mainMenuItems.Insert(2, "Manage Users");
+                        mainMenuItems.Insert(3, "Messages History");
                     }
                     else if (activeUserManager.UserAccess == Accessibility.user)
                     {
-                        mainMenuItems.Insert(4, "Messages History");
+                        mainMenuItems.Insert(2, "Messages History");
                     }
 
                     // Acquire the choice of function from the user using a vertical menu
@@ -66,17 +64,9 @@ namespace Project1Afdemp
                     {
                         MenuFunctions.ShowChat(activeUserManager);
                     }
-                    else if (userChoice.Contains("Send Email"))
+                    else if (userChoice.Contains("Personal Messages"))
                     {
-                        MenuFunctions.SendEmail(activeUserManager);
-                    }
-                    else if (userChoice.Contains("Inbox"))
-                    {
-                        MenuFunctions.PresentAndManipulateMessage(activeUserManager);
-                    }
-                    else if (userChoice.Contains("Sent"))
-                    {
-                        MenuFunctions.PresentAndManipulateMessage(activeUserManager, Received:false);
+                        MenuFunctions.PersonalMessages(activeUserManager);
                     }
                     else if (userChoice.Contains("Messages History"))
                     {

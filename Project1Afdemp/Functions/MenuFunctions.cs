@@ -93,82 +93,40 @@ namespace Project1Afdemp
             }
         }
 
-        public static void SendEmail(UserManager activeUserManager, User receiver = null, string reTitle = "")
+        public static void PersonalMessages(UserManager activeUserManager)
         {
-            string title;
-            if (receiver is null)
+            while(true)
             {
-                title = "\n\n\tTitle: ";
-                receiver = SideFunctions.SelectUser(activeUserManager);
-            }
-            else
-            {
-                title = "\n\n\tTitle: RE> " + reTitle;
-            }
-            if (receiver is null) { return; }
-            Console.WriteLine(StringsFormatted.SendEmail);
-            Console.Write(title);
-            string MessageTitle = (title.Contains("RE")) ? "RE> " + reTitle : Console.ReadLine();
-
-            Console.Write("\n\tBody: ");
-            string MessageBody = Console.ReadLine();
-
-            using (var database = new DatabaseStuff())
-            {
-                int senderId = database.Users.Single(i => i.UserName == activeUserManager.UserName).Id;
-                Message email = new Message(senderId, receiver.Id, MessageTitle, MessageBody);
-                try
-                {
-                    database.Messages.Add(email);
-                    database.SaveChanges();
-                    Console.Write($"\n\n\tEmail sent successfully to {receiver.UserName}\n\n\tOK");
-                }
-                catch (Exception e) { PrintException(e); }
-                Console.ReadKey();
-            }
-        }
-
-        public static void PresentAndManipulateMessage(UserManager activeUserManager, bool Received = true)
-        {
-            string userChoice;
-            do
-            {
-                Message selectedMessage = SideFunctions.SelectMessage(activeUserManager, Received);
-                if (selectedMessage is null) { return; }
-                string presentedMessage = StringsFormatted.ReadEmails + $"\n\n\tTitle: {selectedMessage.Title}" +
-                    $"\n\n\tBody: {selectedMessage.Body}\n\n";
-                List<string> messageOptions = new List<string> { "Forward", "Delete", "Back" };
-                if (Received)
-                { messageOptions.Insert(0, "Reply"); }
-                else
-                { messageOptions.Insert(0, "Edit"); }
-
-                userChoice = Menus.HorizontalMenu(presentedMessage, messageOptions);
                 using (var database = new DatabaseStuff())
                 {
-                    Message readMessage = database.Messages.Single(m => m.Id == selectedMessage.Id);
-                    readMessage.IsRead = true;
-                    database.SaveChanges();
-                    if (userChoice.Contains("Forward"))
+                    // Probe the database for the nuber of unread messages in chat and unread mail
+                    int unreadMessages = database.Messages.Count(message => message.IsRead == false && message.Receiver.Id == activeUserManager.TheUser.Id);
+                    int sentMessages = database.Messages.Count(message => message.Sender.Id == activeUserManager.TheUser.Id);
+
+                    // Create the Message Menu items common to all users
+                    List<string> messageMenuItems = new List<string> { $"Create NEW", $"Inbox ({unreadMessages})", $"Sent  ({sentMessages})", "Back" };
+
+                    // Acquire the choice of function from the user using a vertical menu
+                    string userChoice = Menus.VerticalMenu(StringsFormatted.PersonalMessages, messageMenuItems);
+
+                    if (userChoice.Contains("Create"))
                     {
-                        SideFunctions.ForwardMessage(activeUserManager, selectedMessage);
+                        PersonalMessageFunctions.SendEmail(activeUserManager);
                     }
-                    else if (userChoice.Contains("Reply"))
+                    else if (userChoice.Contains("Inbox"))
                     {
-                        User toBeReplied = database.Users.Single(u => u.Id == readMessage.Sender.Id);
-                        SendEmail(activeUserManager, toBeReplied, readMessage.Title);
+                        PersonalMessageFunctions.PresentAndManipulateMessage(activeUserManager);
                     }
-                    else if (userChoice.Contains("Edit"))
+                    else if (userChoice.Contains("Sent"))
                     {
-                        SideFunctions.UpdateEmail(activeUserManager, selectedMessage);
+                        PersonalMessageFunctions.PresentAndManipulateMessage(activeUserManager, Received: false);
                     }
-                    else if (userChoice.Contains("Delete"))
+                    else
                     {
-                        SideFunctions.DeleteMessage(selectedMessage);
+                        return;
                     }
                 }
             }
-            while (!userChoice.Contains("Back"));
         }
 
         public static void CommunicationHistory(UserManager activeUserManager)
@@ -187,7 +145,7 @@ namespace Project1Afdemp
                     {
                         senderName = database.Users.Single(i => i.Id == message.SenderId).UserName;
                         receiverName = database.Users.Single(i => i.Id == message.ReceiverId).UserName;
-                        Console.WriteLine($"\t{message.TimeSent} {senderName} sent '{message.Title}' to {receiverName}");
+                        Console.WriteLine($"\t{message.TimeSent.ToString("dd/MM HH:mm")} {senderName} sent '{message.Title}' to {receiverName}");
                     }
                 }
                 catch (Exception e) { PrintException(e); }
@@ -202,22 +160,22 @@ namespace Project1Afdemp
             string manageUsersChoice = Menus.VerticalMenu(StringsFormatted.ManageUsers, ChangeUserMenuItems);
             if (manageUsersChoice.Contains("Create"))
             {
-                SideFunctions.CreateNewUser();
+                ManageUserFunctions.CreateNewUser();
                 return;
             }
             else if (manageUsersChoice.Contains("Back"))
             {
                 return;
             }
-            User receiver = SideFunctions.SelectUser(activeUserManager);
+            User receiver = ManageUserFunctions.SelectUser(activeUserManager);
             if (receiver is null) { return; }
             if (manageUsersChoice == "Delete User")
             {
-                SideFunctions.DeleteUser(receiver);
+                ManageUserFunctions.DeleteUser(receiver);
             }
             else if (manageUsersChoice == "Permissions")
             {
-                SideFunctions.ChangeUserPermissions(receiver);
+                ManageUserFunctions.ChangeUserPermissions(receiver);
             }
         }
 
