@@ -1,29 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Project1Afdemp
 {
     class PersonalMessageFunctions
     {
-        public static void SendEmail(UserManager activeUserManager, User receiver = null, string reTitle = "")
+        public static void SendEmail(UserManager activeUserManager, User receiver = null, string replyTitle = "")
         {
-            string title;
-            if (receiver is null)
-            {
-                title = "\n\n\tTitle: ";
-                receiver = ManageUserFunctions.SelectUser(activeUserManager);
-            }
-            else
-            {
-                title = "\n\n\tTitle: RE> " + reTitle;
-            }
+            string title = "\n\n\tTitle: " + replyTitle;
+
+            // NULL Receiver means it's NOT a REPLY it's just a NEW message.
+            if (receiver is null) { receiver = ManageUserFunctions.SelectUser(activeUserManager); }
             if (receiver is null) { return; }
+
             Console.WriteLine(StringsFormatted.SendEmail);
             Console.Write(title);
-            string MessageTitle = (title.Contains("RE")) ? "RE> " + reTitle : Console.ReadLine();
+
+            string MessageTitle = (title.Contains("RE")) ? replyTitle : Console.ReadLine();
 
             Console.Write("\n\tBody: ");
             string MessageBody = Console.ReadLine();
@@ -49,16 +43,22 @@ namespace Project1Afdemp
             do
             {
                 Message selectedMessage = SelectMessage(activeUserManager, Messages, Received);
+
                 if (selectedMessage is null) { return; }
-                string presentedMessage = StringsFormatted.ReadEmails + $"\n\n\tTitle: {selectedMessage.Title}" +
-                    $"\n\n\tBody: {selectedMessage.Body}\n\n";
+
+                string presentedMessage = StringsFormatted.ReadEmails
+                                        + $"\n\n\tTitle: {selectedMessage.Title}"
+                                        + $"\n\n\tBody:  {selectedMessage.Body}\n\n";
+
                 List<string> messageOptions = new List<string> { "Forward", "Delete", "Back" };
+
                 if (Received)
                 { messageOptions.Insert(0, "Reply"); }
                 else
                 { messageOptions.Insert(0, "Edit"); }
 
                 userChoice = Menus.HorizontalMenu(presentedMessage, messageOptions);
+
                 using (var database = new DatabaseStuff())
                 {
                     Message readMessage = database.Messages.Single(m => m.Id == selectedMessage.Id);
@@ -71,7 +71,7 @@ namespace Project1Afdemp
                     else if (userChoice.Contains("Reply"))
                     {
                         User toBeReplied = database.Users.Single(u => u.Id == readMessage.Sender.Id);
-                        SendEmail(activeUserManager, toBeReplied, readMessage.Title);
+                        SendEmail(activeUserManager, toBeReplied, "RE> " + readMessage.Title);
                     }
                     else if (userChoice.Contains("Edit"))
                     {
@@ -80,6 +80,7 @@ namespace Project1Afdemp
                     else if (userChoice.Contains("Delete"))
                     {
                         DeleteMessage(selectedMessage);
+                        return;
                     }
                 }
             }
@@ -104,7 +105,7 @@ namespace Project1Afdemp
                             if (message.ReceiverId == UserId)
                             {
                                 receiverName = database.Users.Single(i => i.Id == message.SenderId).UserName;
-                                selectMessageItems.Add(CustomizeAppearanceOfMessages(message, receiverName, Received));
+                                selectMessageItems.Add(CustomizeAppearanceOfMessage(message, receiverName, Received));
                             }
                         }
                         else
@@ -112,12 +113,12 @@ namespace Project1Afdemp
                             if (message.SenderId == UserId)
                             {
                                 receiverName = database.Users.Single(i => i.Id == message.ReceiverId).UserName;
-                                selectMessageItems.Add(CustomizeAppearanceOfMessages(message, receiverName, Received));
+                                selectMessageItems.Add(CustomizeAppearanceOfMessage(message, receiverName, Received));
                             }
                         }
                     }
                 }
-                catch (Exception e) { Console.WriteLine(e); }
+                catch (Exception e) { MenuFunctions.PrintException(e); }
 
                 if (selectMessageItems.Count == 0)
                 {
@@ -131,31 +132,20 @@ namespace Project1Afdemp
                 {
                     return null;
                 }
-                string[] selParameters = oMessage.Split('|');
-                int messageID = int.Parse(selParameters[1]);
+                int messageID = int.Parse(oMessage.Split('|')[1]);
 
                 Console.Clear();
                 return database.Messages.Single(i => i.Id == messageID);
             }
         }
 
-        public static string CustomizeAppearanceOfMessages(Message message, string receiverName, bool Received)
+        public static string CustomizeAppearanceOfMessage(Message message, string receiverName, bool Received)
         {
-            string direction = (Received) ? "From" : "To:";
-            string listedMessage;
-            using (var database = new DatabaseStuff())
-            {
-                if (!message.IsRead)
-                {
-                    listedMessage = "* ";
-                }
-                else
-                {
-                    listedMessage = "";
-                }
-                listedMessage += $"ID: |{message.Id}| {direction} |{receiverName}| Title: |{message.Title}| Time Sent: |{message.TimeSent}|";
-                return listedMessage;
-            }
+            string direction     = (Received)       ? "From:" : "To:";
+            string listedMessage = (message.IsRead) ? ""      : "* ";
+
+            listedMessage += $"{direction} {receiverName} Title: '{message.Title}' Time Sent: {message.TimeSent.ToString("dd/MM HH:mm")} ID: |{message.Id}|";
+            return listedMessage;
         }
 
         public static void UpdateEmail(UserManager activeUserManager, Message editMessage)
@@ -185,6 +175,7 @@ namespace Project1Afdemp
         public static void ForwardMessage(UserManager activeUserManager, Message forwardMessage)
         {
             User receiver = ManageUserFunctions.SelectUser(activeUserManager);
+            if (receiver is null) { return; }
             string forwardTitle = "FW:" + forwardMessage.Title;
             string forwardBody = forwardMessage.Body;
             Message forwardedMessage = new Message(activeUserManager.TheUser.Id, receiver.Id, forwardTitle, forwardBody);
