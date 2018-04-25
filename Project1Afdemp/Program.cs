@@ -16,6 +16,7 @@ namespace Project1Afdemp
                 {
                     try
                     {
+                        Console.WriteLine("\n\n\tTrying to create database. Please wait..");
                         UserManager newAdmin = new UserManager("admin", "aDmI3$", true);
                         UserManager newGuest = new UserManager("guest", "guest", true);
                     }

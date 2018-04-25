@@ -140,21 +140,23 @@ namespace Project1Afdemp
 
         public static void CommunicationHistory(UserManager activeUserManager)
         {
-            Console.Clear();
-            Console.WriteLine(StringsFormatted.History + '\n');
             using (var database = new DatabaseStuff())
             {
-                List<Message> messages = database.Messages.ToList();
-                int receiverId = database.Users.Single(i => i.UserName == activeUserManager.UserName).Id;
-                string senderName;
-                string receiverName;
+                List<Message> allMessages = database.Messages.Include("Sender").Include("Receiver").ToList();
+                if(allMessages.Count == 0)
+                {
+                    PrintNoContent("No messages yet");
+                    return;
+                }
+                Console.Clear();
+                Console.WriteLine(StringsFormatted.History + '\n');
                 try
                 {
-                    foreach (Message message in messages)
+                    foreach (Message message in allMessages)
                     {
-                        senderName = database.Users.Single(i => i.Id == message.SenderId).UserName;
-                        receiverName = database.Users.Single(i => i.Id == message.ReceiverId).UserName;
-                        Console.WriteLine($"\t{message.TimeSent.ToString("dd/MM HH:mm")} {senderName} sent '{message.Title}' to {receiverName}");
+                        Console.WriteLine($"\t{message.TimeSent.ToString("dd/MM HH:mm")} " +
+                                        $"{message.Sender.UserName} sent '{message.Title}' " +
+                                        $"to {message.Receiver.UserName}");
                     }
                 }
                 catch (Exception e) { PrintException(e); }
@@ -194,6 +196,14 @@ namespace Project1Afdemp
             Console.WriteLine($"\n\n\tThat's it! You are now logged in as {activeUserManager.UserAccess} {activeUserManager.UserName}");
             Thread.Sleep(1200);
             return activeUserManager;
+        }
+
+        public static void PrintNoContent(string absentContent)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("\n\n\t" + absentContent);
+            Console.ResetColor();
+            Console.ReadKey();
         }
 
         public static void PrintException(Exception e)

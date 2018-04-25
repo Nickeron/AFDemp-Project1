@@ -42,6 +42,12 @@ namespace Project1Afdemp
             string userChoice;
             do
             {
+                if (Messages.Count == 0)
+                {
+                    MenuFunctions.PrintNoContent("No Messages to View");
+                    return;
+                }
+
                 Message selectedMessage = SelectMessage(activeUserManager, Messages, Received);
 
                 if (selectedMessage is null) { return; }
@@ -89,13 +95,6 @@ namespace Project1Afdemp
 
         public static Message SelectMessage(UserManager activeUserManager, List<Message> Messages, bool Received)
         {
-            if (Messages.Count == 0)
-            {
-                Console.WriteLine("\n\n\tNo Messages to View");
-                Console.ReadKey();
-                return null;
-            }
-
             List<string> selectMessageItems = new List<string>();
             string receiverName;
 
