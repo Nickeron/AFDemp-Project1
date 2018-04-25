@@ -43,12 +43,12 @@ namespace Project1Afdemp
             }
         }
 
-        public static void PresentAndManipulateMessage(UserManager activeUserManager, bool Received = true)
+        public static void PresentAndManipulateMessage(UserManager activeUserManager, List<Message> Messages, bool Received = true)
         {
             string userChoice;
             do
             {
-                Message selectedMessage = SelectMessage(activeUserManager, Received);
+                Message selectedMessage = SelectMessage(activeUserManager, Messages, Received);
                 if (selectedMessage is null) { return; }
                 string presentedMessage = StringsFormatted.ReadEmails + $"\n\n\tTitle: {selectedMessage.Title}" +
                     $"\n\n\tBody: {selectedMessage.Body}\n\n";
@@ -62,7 +62,7 @@ namespace Project1Afdemp
                 using (var database = new DatabaseStuff())
                 {
                     Message readMessage = database.Messages.Single(m => m.Id == selectedMessage.Id);
-                    readMessage.IsRead = true;
+                    if (Received) { readMessage.IsRead = true; }
                     database.SaveChanges();
                     if (userChoice.Contains("Forward"))
                     {
@@ -86,34 +86,25 @@ namespace Project1Afdemp
             while (!userChoice.Contains("Back"));
         }
 
-        public static Message SelectMessage(UserManager activeUserManager, bool Received)
+        public static Message SelectMessage(UserManager activeUserManager, List<Message> Messages, bool Received)
         {
             List<string> selectMessageItems = new List<string>();
+            string receiverName;
             using (var database = new DatabaseStuff())
             {
-                List<Message> messages = database.Messages.ToList();
+                //List<Message> messages = database.Messages.ToList();
                 int UserId = database.Users.Single(i => i.UserName == activeUserManager.UserName).Id;
-                string receiverName;
+
                 try
                 {
-                    string listedMessage;
-                    foreach (Message message in messages)
+                    foreach (Message message in Messages)
                     {
                         if (Received)
                         {
                             if (message.ReceiverId == UserId)
                             {
                                 receiverName = database.Users.Single(i => i.Id == message.SenderId).UserName;
-                                if (!message.IsRead)
-                                {
-                                    listedMessage = "* ";
-                                }
-                                else
-                                {
-                                    listedMessage = "";
-                                }
-                                listedMessage += $"ID: |{message.Id}| From: |{receiverName}| Title: |{message.Title}| Time Sent: |{message.TimeSent}|";
-                                selectMessageItems.Add(listedMessage);
+                                selectMessageItems.Add(CustomizeAppearanceOfMessages(message, receiverName, Received));
                             }
                         }
                         else
@@ -121,8 +112,7 @@ namespace Project1Afdemp
                             if (message.SenderId == UserId)
                             {
                                 receiverName = database.Users.Single(i => i.Id == message.ReceiverId).UserName;
-                                listedMessage = $"ID: |{message.Id}| To: |{receiverName}| Title: |{message.Title}| Time Sent: |{message.TimeSent}|";
-                                selectMessageItems.Add(listedMessage);
+                                selectMessageItems.Add(CustomizeAppearanceOfMessages(message, receiverName, Received));
                             }
                         }
                     }
@@ -146,6 +136,25 @@ namespace Project1Afdemp
 
                 Console.Clear();
                 return database.Messages.Single(i => i.Id == messageID);
+            }
+        }
+
+        public static string CustomizeAppearanceOfMessages(Message message, string receiverName, bool Received)
+        {
+            string direction = (Received) ? "From" : "To:";
+            string listedMessage;
+            using (var database = new DatabaseStuff())
+            {
+                if (!message.IsRead)
+                {
+                    listedMessage = "* ";
+                }
+                else
+                {
+                    listedMessage = "";
+                }
+                listedMessage += $"ID: |{message.Id}| {direction} |{receiverName}| Title: |{message.Title}| Time Sent: |{message.TimeSent}|";
+                return listedMessage;
             }
         }
 
