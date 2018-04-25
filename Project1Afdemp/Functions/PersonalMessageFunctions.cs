@@ -71,7 +71,7 @@ namespace Project1Afdemp
                     else if (userChoice.Contains("Reply"))
                     {
                         User toBeReplied = database.Users.Single(u => u.Id == readMessage.Sender.Id);
-                        SendEmail(activeUserManager, toBeReplied, "RE> " + readMessage.Title);
+                        SendEmail(activeUserManager, toBeReplied, "RE: " + readMessage.Title);
                     }
                     else if (userChoice.Contains("Edit"))
                     {
@@ -101,21 +101,11 @@ namespace Project1Afdemp
                     foreach (Message message in Messages)
                     {
                         if (Received)
-                        {
-                            if (message.ReceiverId == UserId)
-                            {
-                                receiverName = database.Users.Single(i => i.Id == message.SenderId).UserName;
-                                selectMessageItems.Add(CustomizeAppearanceOfMessage(message, receiverName, Received));
-                            }
-                        }
+                        { receiverName = database.Users.Single(i => i.Id == message.SenderId).UserName; }
                         else
-                        {
-                            if (message.SenderId == UserId)
-                            {
-                                receiverName = database.Users.Single(i => i.Id == message.ReceiverId).UserName;
-                                selectMessageItems.Add(CustomizeAppearanceOfMessage(message, receiverName, Received));
-                            }
-                        }
+                        { receiverName = database.Users.Single(i => i.Id == message.ReceiverId).UserName; }
+
+                        selectMessageItems.Add(CustomizeAppearanceOfMessage(message, receiverName, Received));
                     }
                 }
                 catch (Exception e) { MenuFunctions.PrintException(e); }
@@ -141,8 +131,8 @@ namespace Project1Afdemp
 
         public static string CustomizeAppearanceOfMessage(Message message, string receiverName, bool Received)
         {
-            string direction     = (Received)       ? "From:" : "To:";
-            string listedMessage = (message.IsRead) ? ""      : "* ";
+            string direction = (Received) ? "From:" : "To:";
+            string listedMessage = (message.IsRead) ? "" : "* ";
 
             listedMessage += $"{direction} {receiverName} Title: '{message.Title}' Time Sent: {message.TimeSent.ToString("dd/MM HH:mm")} ID: |{message.Id}|";
             return listedMessage;
@@ -176,7 +166,7 @@ namespace Project1Afdemp
         {
             User receiver = ManageUserFunctions.SelectUser(activeUserManager);
             if (receiver is null) { return; }
-            string forwardTitle = "FW:" + forwardMessage.Title;
+            string forwardTitle = "FW: " + forwardMessage.Title;
             string forwardBody = forwardMessage.Body;
             Message forwardedMessage = new Message(activeUserManager.TheUser.Id, receiver.Id, forwardTitle, forwardBody);
             using (var database = new DatabaseStuff())
