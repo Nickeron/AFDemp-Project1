@@ -99,12 +99,21 @@ namespace Project1Afdemp
             {
                 using (var database = new DatabaseStuff())
                 {
-                    // Probe the database for the nuber of unread messages in chat and unread mail
-                    int unreadMessages = database.Messages.Count(message => message.IsRead == false && message.Receiver.Id == activeUserManager.TheUser.Id);
-                    int sentMessages = database.Messages.Count(message => message.Sender.Id == activeUserManager.TheUser.Id);
+                    // Probe the database for the sent and received personal messages
+                    List<Message> receivedMessages  = database.Messages.Where(message => message.Receiver.Id == activeUserManager.TheUser.Id).ToList();
+                    List<Message> sentMessages      = database.Messages.Where(message => message.Sender.Id == activeUserManager.TheUser.Id).ToList();
+
+                    int countReceivedMessages       = receivedMessages.Count;
+                    int countUnreadReceivedMessages = receivedMessages.Count(message => message.IsRead == false);
+                    int countSentMessages           = sentMessages.Count;
+                    int countUnreadSentMessages     = sentMessages.Count(message => message.IsRead == false);
+
+                    string inbox = $"Inbox ({countUnreadReceivedMessages}/{countReceivedMessages})";
+                    string sent  = $"Sent  ({countUnreadSentMessages}/{countSentMessages})";
+                    
 
                     // Create the Message Menu items common to all users
-                    List<string> messageMenuItems = new List<string> { $"Create NEW", $"Inbox ({unreadMessages})", $"Sent  ({sentMessages})", "Back" };
+                    List<string> messageMenuItems = new List<string> { $"Create NEW", $"{inbox}", $"{sent}", "Back" };
 
                     // Acquire the choice of function from the user using a vertical menu
                     string userChoice = Menus.VerticalMenu(StringsFormatted.PersonalMessages, messageMenuItems);
@@ -115,11 +124,11 @@ namespace Project1Afdemp
                     }
                     else if (userChoice.Contains("Inbox"))
                     {
-                        PersonalMessageFunctions.PresentAndManipulateMessage(activeUserManager);
+                        PersonalMessageFunctions.PresentAndManipulateMessage(activeUserManager, receivedMessages);
                     }
                     else if (userChoice.Contains("Sent"))
                     {
-                        PersonalMessageFunctions.PresentAndManipulateMessage(activeUserManager, Received: false);
+                        PersonalMessageFunctions.PresentAndManipulateMessage(activeUserManager, sentMessages, Received: false);
                     }
                     else
                     {
