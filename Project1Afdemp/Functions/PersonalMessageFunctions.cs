@@ -89,39 +89,36 @@ namespace Project1Afdemp
 
         public static Message SelectMessage(UserManager activeUserManager, List<Message> Messages, bool Received)
         {
+            if (Messages.Count == 0)
+            {
+                Console.WriteLine("\n\n\tNo Messages to View");
+                Console.ReadKey();
+                return null;
+            }
+
             List<string> selectMessageItems = new List<string>();
             string receiverName;
+
             using (var database = new DatabaseStuff())
             {
-                //List<Message> messages = database.Messages.ToList();
                 int UserId = database.Users.Single(i => i.UserName == activeUserManager.UserName).Id;
 
-                try
+                foreach (Message message in Messages)
                 {
-                    foreach (Message message in Messages)
-                    {
-                        if (Received)
-                        { receiverName = database.Users.Single(i => i.Id == message.SenderId).UserName; }
-                        else
-                        { receiverName = database.Users.Single(i => i.Id == message.ReceiverId).UserName; }
+                    if (Received)
+                    { receiverName = message.Sender.UserName; }
+                    else
+                    { receiverName = message.Receiver.UserName; }
 
-                        selectMessageItems.Add(CustomizeAppearanceOfMessage(message, receiverName, Received));
-                    }
+                    selectMessageItems.Add(CustomizeAppearanceOfMessage(message, receiverName, Received));
                 }
-                catch (Exception e) { MenuFunctions.PrintException(e); }
 
-                if (selectMessageItems.Count == 0)
-                {
-                    Console.WriteLine("\n\n\tNo Messages to View");
-                    Console.ReadKey();
-                    return null;
-                }
                 selectMessageItems.Add("Back");
                 string oMessage = Menus.VerticalMenu(StringsFormatted.OpenMessage, selectMessageItems);
+
                 if (oMessage.Contains("Back"))
-                {
-                    return null;
-                }
+                {  return null; }
+
                 int messageID = int.Parse(oMessage.Split('|')[1]);
 
                 Console.Clear();

@@ -100,8 +100,8 @@ namespace Project1Afdemp
                 using (var database = new DatabaseStuff())
                 {
                     // Probe the database for the sent and received personal messages
-                    List<Message> receivedMessages  = database.Messages.Where(message => message.Receiver.Id == activeUserManager.TheUser.Id).ToList();
-                    List<Message> sentMessages      = database.Messages.Where(message => message.Sender.Id == activeUserManager.TheUser.Id).ToList();
+                    List<Message> receivedMessages  = database.Messages.Include("Sender").Where(message => message.Receiver.Id == activeUserManager.TheUser.Id).ToList();
+                    List<Message> sentMessages      = database.Messages.Include("Receiver").Where(message => message.Sender.Id == activeUserManager.TheUser.Id).ToList();
 
                     int countReceivedMessages       = receivedMessages.Count;
                     int countUnreadReceivedMessages = receivedMessages.Count(message => message.IsRead == false);

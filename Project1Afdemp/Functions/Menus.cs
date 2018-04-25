@@ -7,6 +7,7 @@ namespace Project1Afdemp
     {
         public static string VerticalMenu(string message, List<string> menuItems)
         {
+            Console.CursorVisible = false;
             short currentItem = 0, item;
             ConsoleKeyInfo keyInfo;
 
@@ -18,6 +19,10 @@ namespace Project1Afdemp
                     return "";
                 for (item = 0; item < menuItems.Count; item++)
                 {
+                    if (menuItems[item].Contains("Back"))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                    }
                     if (currentItem == item)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
@@ -47,11 +52,13 @@ namespace Project1Afdemp
                 }
                 // Loop around until the user presses enter.
             } while (keyInfo.KeyChar != 13);
+            Console.CursorVisible = true;
             return menuItems[currentItem];
         }
 
         public static string HorizontalMenu(string message, List<string> menuItems)
         {
+            Console.CursorVisible = false;
             short currentItem = 0, item;
             ConsoleKeyInfo keyInfo;
 
@@ -63,6 +70,9 @@ namespace Project1Afdemp
                     return "";
                 for (item = 0; item < menuItems.Count; item++)
                 {
+                    if (menuItems[item].Contains("Back")){
+                        Console.ForegroundColor = ConsoleColor.Red;
+                    }
                     if (currentItem == item)
                     {
                         Console.ForegroundColor = ConsoleColor.Yellow;
@@ -91,6 +101,7 @@ namespace Project1Afdemp
                 }
                 // Loop around until the user presses enter.
             } while (keyInfo.KeyChar != 13);
+            Console.CursorVisible = true;
             return menuItems[currentItem];
         }
     }
